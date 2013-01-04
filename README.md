@@ -1,2 +1,2 @@
-RozkaldFITIS
+RozkladFITIS
 ============
