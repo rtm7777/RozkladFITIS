@@ -1,0 +1,31 @@
+{%extends "header.html"%}
+
+{%block title%}Форум{%endblock%}
+
+{%block additional_res%}<script type="text/javascript" src="//vk.com/js/api/openapi.js?75"></script>{%endblock%}
+
+{%block topnavleft%}
+<li><a href="/rozklad/">Розклад груп</a></li>
+<li><a href="#">Розклад викладачів</a></li>
+<li class="active"><a href="/forum/">Форум</a></li>
+<li><a href="/about/">Про сайт</a></li>
+<li><a href="/experimental/">Experimental</a></li>
+{%endblock%}
+
+{%block topnavadmin%}
+<li class="dropdown">
+{%endblock%}
+
+{%block content%}
+
+<script type="text/javascript">
+  VK.init({apiId: 3335156, onlyWidgets: true});
+</script>
+
+
+<div id="vk_comments"></div>
+<script type="text/javascript">
+VK.Widgets.Comments("vk_comments", {limit: 5, width: "496", attach: "*"});
+</script>
+<p>forum on site</p>
+{%endblock%}

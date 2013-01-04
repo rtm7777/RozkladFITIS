@@ -1,0 +1,245 @@
+.box_rotate {
+	height: 20px;
+	width: 15px;
+	margin-top: 75px;
+	margin-left: 15px;
+	margin-right: 0;
+	-moz-transform: rotate(270deg);  /* FF3.5+ */
+	-o-transform: rotate(270Zdeg);  /* Opera 10.5 */
+	-webkit-transform: rotate(270deg);  /* Saf3.1+, Chrome */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=6.123031769111886e-17, M12=1, M21=-1, M22=6.123031769111886e-17, SizingMethod='auto expand')";
+}
+
+
+.navbar-static-top div ul li a {
+	padding-left: 8px !important;
+	padding-right: 8px !important;
+}
+
+/*Кнопки соціальних мереж*/
+.social_like {
+	margin: 10px 0 0 0;
+}
+
+.social_like div {
+	display: inline-table;
+}
+
+.fb-like {
+	margin: -3px;
+}
+
+/*Оформлення контейнера для модального вікна set_predmet*/
+.modal_cont1 {
+	margin: 0 15px 0 15px;
+	float: left;
+}
+
+/*Невидимі поля в вікні set_predmet*/
+#day {
+	display: none;
+}
+
+#group {
+	display: none;
+}
+
+/*Колір тексту для неактивної колонки set_predmet*/
+.label_disabled {
+	color: #adadad
+}
+
+/*Стиль для кнопок очистки полів set_predmet*/
+.ui-widget button {
+	margin-bottom: 11px;
+	padding: 4px 3px;
+}
+
+/*Модальне вікно додавання заняття*/
+.modal_cont2 div p {
+	margin: 0px 0 5px;
+}
+
+.modal_cont2>div:nth-child(2) {
+	margin: 10px 0 0 0;
+}
+
+/*Оформлення таблиць розкладу та адміністрування розкладу*/
+tr:hover:nth-child(6n-5) td:first-child {
+	background-color: white !important;
+	cursor: default;
+}
+
+tbody tr {
+	cursor: text;
+}
+
+.subject_content {
+	padding: 2px 5px !important;
+}	
+
+.subject_content p {
+	margin: 2px 0;
+}
+
+.null {
+	margin: 24px 0 !important;
+}
+
+.single_admin {
+	padding: 18px 5px !important;
+}
+
+.single_content {
+	padding: 15px 5px !important;
+
+}
+
+.day_para {
+	width: 60px;
+}
+
+.set_predmet {
+	width: 40px;
+}
+
+.subject_content hr {
+	margin: 0;
+	border-top-color: #ddd;
+	
+}
+
+/*Оформлення головного меню навігації*/
+.navbar {
+	margin-bottom: 10px;
+}
+
+.span3 .nav {
+	padding-top: 10px;
+}
+
+.footer {
+	text-align: center;
+}
+
+.span3>blockquote {
+	margin: 0;
+}
+
+.span9 .hero-unit {
+	margin: 35px 0;
+}
+
+/*Меню вкладок адміністрування розкладу*/
+.opt_hide {
+	display: none;
+}
+
+/*Меню вибору групи при пререгляді розкладу*/
+.nav_tab_group li a {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+/*Стилі для кнопки вгору та випливаючих повідомлень*/
+#toTop {
+	position:fixed;
+	bottom:20px;
+	right:20px;
+	cursor:pointer;
+	opacity: 0.6;
+	display: none;
+}
+
+.alert {
+	display: none;
+	position: fixed;
+	bottom: 5px;
+	left: 50%;
+}
+
+/*Вхід користувача*/
+.login-form {
+	text-align: center;
+}
+
+/*Анімація завантаження*/
+#load_animation {
+	display: none;
+}
+
+.circle {
+	position: fixed;
+	bottom: 70px;
+	right: 50px;
+	background-color: rgba(23, 190, 255, 0.59);
+	border: 5px solid rgba(248, 162, 14, 0.9);
+	opacity: .9;
+	border-right: 5px solid rgba(60, 136, 71, 0.9);
+	border-left: 5px solid rgba(185, 74, 72, 0.9);
+	border-radius: 50px;
+	box-shadow: 0 0 35px #FFFFA6;
+	width: 50px;
+	height: 50px;
+	margin: 0 auto;
+	-moz-animation: spinPulse 1s infinite ease-in-out;
+	-webkit-animation: spinPulse 1s infinite linear;
+	-o-animation: spinPulse 1s infinite linear;
+	-animation: spinPulse 1s infinite linear;
+}
+.circle1 {
+	background-color: rgba(172, 172, 37, 0.5);
+	border: 5px solid rgba(58, 135, 171, 0.9);
+	opacity: .9;
+	border-left: 5px solid rgba(180, 24, 105, 0.49);
+	border-right: 5px solid rgba(20, 101, 223, 0.47);
+	border-radius: 50px;
+	box-shadow: 0 0 15px rgba(7, 34, 60, 0.75);
+	width: 30px;
+	height: 30px;
+	margin: 0 auto;
+	position: fixed;
+	bottom: 80px;
+	right: 60px;
+	-moz-animation: spinoffPulse 1s infinite linear;
+	-webkit-animation: spinoffPulse 1s infinite linear;
+	-o-animation: spinoffPulse 1s infinite linear;
+	-animation: spinoffPulse 1s infinite linear;
+}
+
+@-moz-keyframes spinPulse {
+	0% { -moz-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7;}
+	50% { -moz-transform:rotate(145deg); opacity:1; }
+	100% { -moz-transform:rotate(-320deg); opacity:0; }
+}
+@-moz-keyframes spinoffPulse {
+	0% { -moz-transform:rotate(0deg); }
+	100% { -moz-transform:rotate(360deg);  }
+}
+@-webkit-keyframes spinPulse {
+	0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+	50% { -webkit-transform:rotate(145deg); opacity:1;}
+	100% { -webkit-transform:rotate(-320deg); opacity:0; }
+}
+@-webkit-keyframes spinoffPulse {
+	0% { -webkit-transform:rotate(0deg); }
+	100% { -webkit-transform:rotate(360deg); }
+}
+@-o-keyframes spinPulse {
+	0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+	50% { -webkit-transform:rotate(145deg); opacity:1;}
+	100% { -webkit-transform:rotate(-320deg); opacity:0; }
+}
+@-o-keyframes spinoffPulse {
+	0% { -webkit-transform:rotate(0deg); }
+	100% { -webkit-transform:rotate(360deg); }
+}
+@-keyframes spinPulse {
+	0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+	50% { -webkit-transform:rotate(145deg); opacity:1;}
+	100% { -webkit-transform:rotate(-320deg); opacity:0; }
+}
+@-keyframes spinoffPulse {
+	0% { -webkit-transform:rotate(0deg); }
+	100% { -webkit-transform:rotate(360deg); }
+}

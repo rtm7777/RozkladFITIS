@@ -1,0 +1,101 @@
+{%extends "header.html"%}
+
+{% load extras %}
+
+{%block title%}Розклад{%endblock%}
+
+{%block additional_res%}<script type="text/javascript" src="//vk.com/js/api/openapi.js?75"></script>{%endblock%}
+
+{%block topnavleft%}
+<li class="active"><a href="/rozklad/">Розклад груп</a></li>
+<li><a href="#">Розклад викладачів</a></li>
+<li><a href="/forum/">Форум</a></li>
+<li><a href="/about/">Про сайт</a></li>
+<li><a href="/experimental/">Experimental</a></li>
+{%endblock%}
+
+{%block topnavadmin%}
+<li class="dropdown">
+{%endblock%}
+
+{%block content%}
+
+<div class="row">
+	<div class="span3">
+		<blockquote>
+			<p>Групи</p>
+		</blockquote>
+		<ul class="nav nav-tabs nav-stacked nav_tab_group">
+			{%for group in groups%}
+				{%if group == active_group%}
+					<li class="active"><a href="/rozklad/{{group}}">{{group}}</a></li>
+				{%else%}
+					<li><a href="/rozklad/{{group}}">{{group}}</a></li>
+				{%endif%}
+			{%endfor%}
+		</ul>
+	</div>
+	<div class="span9">
+
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th class="day_para">День</th>
+					<th class="day_para">Пара</th>
+					<th>Предмет</th>
+				</tr>
+			</thead>
+			<tbody>
+				{%for key, value in result.items|sort%}
+					{%for k, v in value.items|sort%}
+					<tr>
+						{%if k == 'I'%}
+						<td rowspan="6"><div class="box_rotate">{{key|slice:"1:"}}</div></td>
+						{%endif%}
+						<td>{{k}}</td>
+						<td class="subject_content">
+						{%if v.type == 0%}
+							<p class="null"></p>
+							<hr>
+							<p class="null"></p>
+						{%elif v.type == 1%}
+							<p class="single_content">{{v.1}}</p>
+						{%elif v.type == 2%}
+							<p>{{v.2}}</p>
+							<hr>
+							<p class="null"></p>
+						{%elif v.type == 3%}
+							<p class="null"></p>
+							<hr>
+							<p>{{v.3}}</p>
+						{%elif v.type == 4%}
+							<p>{{v.2}}</p>
+							<hr>
+							<p>{{v.3}}</p>
+						{%endif%}
+						</td>
+					</tr>
+					{%endfor%}
+				{%endfor%}
+			</tbody>
+		</table>
+		<div id="fb-root"></div>
+		<div class="fb-comments" data-href="{{ myurl }}" data-width="700" data-num-posts="3"></div>
+		<script>(function(d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) return;
+			js = d.createElement(s); js.id = id;
+			js.src = "//connect.facebook.net/uk_UA/all.js#xfbml=1&appId=288131697957171";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));</script>
+		<script type="text/javascript">
+			VK.init({apiId: 3335156, onlyWidgets: true});
+		</script>
+		<div id="vk_comments"></div>
+		<script type="text/javascript">
+			VK.Widgets.Comments("vk_comments", {limit: 5, width: "700", attach: "*"});
+		</script>
+	</div>
+</div>
+
+{%endblock%}

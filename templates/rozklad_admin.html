@@ -1,0 +1,306 @@
+{%extends "header.html"%}
+
+{%block title%}Адміністрування розкладу{%endblock%}
+
+{%block topnavleft%}
+<li><a href="/rozklad/">Розклад груп</a></li>
+<li><a href="#">Розклад викладачів</a></li>
+<li><a href="/forum/">Форум</a></li>
+<li><a href="/about/">Про сайт</a></li>
+<li><a href="/experimental/">Experimental</a></li>
+{%endblock%}
+
+{%block topnavadmin%}
+<li class="dropdown active">
+{%endblock%}
+
+{%block content%}
+			<div class="row">
+				<div id="rozklad_span3" class="span3">
+					<div id="opt_rozklad">
+						<ul class="nav nav-list well">
+							<li class="nav-header">Опції</li>
+							<li class="dropdown-submenu">
+								<a id="group_name" tabindex="-1" href="#">виберіть групу</a>
+								<ul id="group_id" class="dropdown-menu">
+									{%for group in groups%}
+										<li><a href="#" value="{{group}}">{{group}}</a></li>
+									{%endfor%}
+								</ul>
+							</li>
+							<li><a href="#">навантаження</a></li>
+							<li class="divider"></li>
+							<li class="nav-header">Додатково</li>
+							<li><a href="#">додати групове заняття</a></li>
+							<li><a href="#clear_schedule_modal" data-toggle="modal">повністю очистити розклад</a></li>
+							<li><a href="#help_modal" data-toggle="modal">правила користування</a></li>
+						</ul>
+					</div>
+					<div id="opt_audiences" class=" opt_hide">
+						<ul class="nav nav-list well">
+							<li class="nav-header">Опції</li>
+							<li><a href="#">корпус</a></li>
+							<li class="divider"></li>
+							<li class="nav-header">Додатково</li>
+							<li><a href="#">парні-непарні тижні</a></li>
+						</ul>
+					</div>
+					<div id="opt_teachers" class=" opt_hide">
+						<ul class="nav nav-list well">
+							<li class="nav-header">Опції</li>
+							<li><a href="#">навантаження</a></li>
+						</ul>
+					</div>
+					<div id="opt_task" class=" opt_hide">
+						<ul class="nav nav-list well">
+							<li class="nav-header">Опції</li>
+							<li><a href="#add_task_modal" data-toggle="modal">додати</a></li>
+							<li class="divider"></li>
+							<li class="nav-header">Додатково</li>
+							<li><a href="#">сортувати</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span9">
+					<div class="tabbable">
+						<ul id="myTab" class="nav nav-tabs">
+							<li class="active"><a href="#tab1" data-toggle="tab" value="opt_rozklad">Розклад</a></li>
+							<li><a href="#tab2" data-toggle="tab" value="opt_audiences">Зайнятість аудиторій</a></li>
+							<li><a href="#tab3" data-toggle="tab" value="opt_teachers">Зайнятість викладачів</a></li>
+							<li><a href="#tab4" data-toggle="tab" value="opt_task">Завдання кафедр</a></li>
+						</ul>
+						<div class="tab-content">
+							<div id="tab1" class="tab-pane fade in active">
+								<table class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th class="day_para">День</th>
+											<th class="day_para">Пара</th>
+											<th colspan="2">Предмет</th>
+										</tr>
+									</thead>
+									<tbody>
+										{%for day in days%}
+											{%for pair in pairs%}
+											<tr id="{{day|slice:"1"}}_{{pair}}" customdata="{{day}} {{pair}}">
+												{%if pair == 'I'%}
+												<td rowspan="6"><div class="box_rotate">{{day|slice:"1:"}}</div></td>
+												{%endif%}
+												<td>{{pair}}</td>
+												<td class="subject_content">
+													<p class="null"></p>
+													<hr>
+													<p class="null"></p>
+												</td>
+											</tr>
+											{%endfor%}
+										{%endfor%}	
+									</tbody>
+								</table>
+								<div id="subject_add_modal" class="modal hide fade">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h3>Заняття</h3>
+									</div>
+									<div class="modal-body">
+										<div>
+											<label class="checkbox">
+												<input id="daycheck" name="daycheck" type="checkbox"> Кожен тиждень - парний/непарний
+											</label>
+										</div>
+										<div class="modal_container">
+											<div class="modal_cont1">
+												<input id="day" type="text">
+												<input id="group" type="text">
+												<div class="ui-widget">
+													<label for="tag1">Предмет: </label>
+													<input id="tag1" type="text" name="predmet"/>
+													<button type="button" class="btn" value="#tag1"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="tag2">Викладач: </label>
+													<input id="tag2" type="text" name="teacher"/>
+													<button type="button" class="btn" value="#tag2"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="tag3">Аудиторія: </label>
+													<input id="tag3" type="text" />
+													<button type="button" class="btn" value="#tag3"><i class="icon-remove"></i></button>
+												</div>
+												<div>
+													<label for="sel1">Корпус:</label>
+													<select id="sel1">
+														{%for house in housings%}
+															<option>{{house}}</option>
+														{%endfor%}
+													</select>
+												</div>
+												<div class="btn-group" id="btn-group1" data-toggle="buttons-radio">
+													<button type="button" class="btn btn-small active" title="Звичайна пара" value="1"><i class="icon-ok"></i></button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+												</div>
+											</div>
+											<div class="modal_cont2">
+												<div class="ui-widget">
+													<label for="tag4">Предмет: </label>
+													<input id="tag4" type="text" name="predmet"/>
+													<button type="button" class="btn" value="#tag4"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="tag5">Викладач: </label>
+													<input id="tag5" type="text" name="teacher"/>
+													<button type="button" class="btn" value="#tag5"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="tag6">Аудиторія: </label>
+													<input id="tag6" type="text" />
+													<button type="button" class="btn" value="#tag6"><i class="icon-remove"></i></button>
+												</div>
+												<div>
+													<label for="sel2">Корпус:</label>
+													<select id="sel2">
+														{%for house in housings%}
+															<option value="{{house}}">{{house}}</option>
+														{%endfor%}
+													</select>
+												</div>
+												<div class="btn-group" id="btn-group2" data-toggle="buttons-radio">
+													<button type="button" class="btn btn-small active" title="Звичайна пара" value="1"><i class="icon-ok"></i></button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
+										<button class="btn btn-primary" id="sendsubject">Зберегти</button>
+									</div>
+								</div>
+
+								<div id="clear_schedule_modal" class="modal hide fade">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h3>Повна очистка розкладу !</h3>
+									</div>
+									<div class="modal-body">
+										<p>Після очистки неможливо буде повернути розклад! Ви насправді бажаєте повністю його очистити?</p>
+										<label class="checkbox">
+											<input id="clearcheck" name="daycheck" type="checkbox"> Так, я хочу очистити розклад
+										</label>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
+										<button class="btn btn-primary" id="clear_schedule" disabled>Очистити</button>
+									</div>
+								</div>
+
+								<div id="help_modal" class="modal hide fade">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h3>Інструкція користувача</h3>
+									</div>
+									<div class="modal-body" >
+										<div class="tabbable tabs-left">
+											<ul class="nav nav-tabs">
+												<li class="active"><a href="#help_add_sub" data-toggle="tab">Додати заняття</a></li>
+												<li><a href="#help_add_group_sub" data-toggle="tab">Додати групове заняття</a></li>
+												<li><a href="#help_del_sub" data-toggle="tab">Видалити заняття</a></li>
+												<li><a href="#help_clear_schedule" data-toggle="tab">Очистити розклад</a></li>
+												<li><a href="#help_evenodd" data-toggle="tab">Парні-непарні</a></li>
+												<li><a href="#help_set_sub" data-toggle="tab">Вибір предмету</a></li>
+												<li><a href="#help_set_teacher" data-toggle="tab">Вибір викладача</a></li>
+											</ul>
+											<div class="tab-content">
+												<div class="tab-pane active" id="help_add_sub">
+													<p>Щоб додати заняття потрібно зробити подвійний клік по необхідній парі і у вікні що відкриється заповнити необхідні поля. Заповнювати поля слід тільки з випадаючого меню, яке відкриється при введенні в поля вводу букви, що міститься в назві параметру який ви вводите. Після цього натиснути <span class="label label-info">Зберегти</span></p>
+												</div>
+												<div class="tab-pane fade" id="help_add_group_sub">
+													<p>Покищо не реалізовано, але алгоритм уже придуманий)</p>
+												</div>
+												<div class="tab-pane fade" id="help_del_sub">
+													<p>Для видалення заняття потрібно поле введення заняття залишити пустим і натиснути <span class="label label-info">Зберегти</span></p>
+												</div>
+												<div class="tab-pane fade" id="help_clear_schedule">
+													<p>Для повної очистки розкладу натисніть <span class="label label-info">повністю очистити розклад</span> і у вікні що відкриється підтвердіть що ви насправді збираєтесь це зробити</p>
+												</div>
+												<div class="tab-pane fade" id="help_evenodd">
+													<p>Для додавання заняття яке проводитиметься кожен тиждень потрібно у вікні додавання заняття відмітити флажок <span class="label label-info">Кожен тиждень - парний/непарний.</span></p>
+													<p>Для додавання занять по парних чи непарних тижнях потрібно зняти флажок <span class="label label-info">Кожен тиждень - парний/непарний.</span>. Зліва додається заняття по непарному тижню, справа по парному.</p>
+												</div>
+												<div class="tab-pane fade" id="help_set_sub">
+													<p>Вибір предмета відбувається при введенні букви яка міститься в його назві у будь-якому регістрі. При натисненні пробілу виводиться весь список</p>
+												</div>
+												<div class="tab-pane fade" id="help_set_teacher">
+													<p>Вибір викладача відбувається при введенні букви яка міститься в його прізвищі у будь-якому регістрі. При натисненні пробілу виводиться весь список</p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">ОК</button>
+									</div>
+								</div>
+							</div>
+							<div id="tab2" class="tab-pane fade">
+								<p>2 vkladka</p>
+							</div>
+							<div id="tab3" class="tab-pane fade">
+								<p>3 vkladka</p>
+							</div>
+							<div id="tab4" class="tab-pane fade">
+								<p>просмотр</p>
+								<div id="add_task_modal" class="modal hide fade">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h3>Додавання завдання</h3>
+									</div>
+									<div class="modal-body">
+										<div class="modal_cont1">
+											<div>
+												<label for="sub_task">Назва дисципліни: </label>
+												<input id="sub_m_tast" type="text"/>
+											</div>
+											<div>
+												<label for="group_task">Назва групи: </label>
+												<input id="group_task" type="text"/>
+											</div>
+											<div class="ui-widget">
+												<label for="tag2">Викладач: </label>
+												<input id="tag2" type="text" name="teacher"/>
+											</div>
+										</div>
+										<div class="modal_cont2">
+											<div>
+												<p>Вид заняття: </p>
+												<div class="btn-group" id="btn-group2" data-toggle="buttons-radio">
+													<button type="button" class="btn active" title="Лекція" value="1">Лек</button>
+													<button type="button" class="btn" title="Лабораторна" value="2">Лаб</button>
+													<button type="button" class="btn" title="Практика" value="3">Практ</button>
+												</div>
+											</div>
+											<div>
+												<p>Годин на тиждень: </p>
+												<div class="btn-group" id="btn-group2" data-toggle="buttons-radio">
+													<button type="button" class="btn" title="0.5 годин на тиждень" value="0.5">0.5</button>
+													<button type="button" class="btn active" title="1 година на тиждень" value="1">1</button>
+													<button type="button" class="btn" title="1.5 години на тиждень" value="1.5">1.5</button>
+													<button type="button" class="btn" title="2 години на тиждень" value="2">2</button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
+										<button class="btn btn-primary">Додати</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+{%endblock%}

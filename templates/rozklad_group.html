@@ -1,0 +1,38 @@
+{%extends "header.html"%}
+
+{%block title%}Розклад{%endblock%}
+
+{%block topnavleft%}
+<li class="active"><a href="/rozklad/">Розклад груп</a></li>
+<li><a href="#">Розклад викладачів</a></li>
+<li><a href="/forum/">Форум</a></li>
+<li><a href="/about/">Про сайт</a></li>
+<li><a href="/experimental/">Experimental</a></li>
+{%endblock%}
+
+{%block topnavadmin%}
+<li class="dropdown">
+{%endblock%}
+
+{%block content%}
+
+<div class="row">
+	<div class="span3">
+		<blockquote>
+			<p>Групи</p>
+		</blockquote>
+		<ul class="nav nav-tabs nav-stacked nav_tab_group">
+			{%for group in groups%}
+				<li><a href="/rozklad/{{group}}">{{group}}</a></li>
+			{%endfor%}
+		</ul>
+	</div>
+	<div class="span9">
+		<div class="hero-unit">
+			<h1>Виберіть групу</h1>
+			<p></p>
+		</div>
+	</div>
+</div>
+
+{%endblock%}
