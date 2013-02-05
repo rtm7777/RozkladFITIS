@@ -1,0 +1,6 @@
+DirectoryIndex /cgi-bin/gitweb.cgi
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.* /cgi-bin/gitweb.cgi/$0 [L,PT]

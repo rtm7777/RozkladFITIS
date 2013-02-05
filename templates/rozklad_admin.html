@@ -4,7 +4,7 @@
 
 {%block topnavleft%}
 <li><a href="/rozklad/">Розклад груп</a></li>
-<li><a href="#">Розклад викладачів</a></li>
+<li><a href="/rozklad_teacher/">Розклад викладачів</a></li>
 <li><a href="/forum/">Форум</a></li>
 <li><a href="/about/">Про сайт</a></li>
 <li><a href="/experimental/">Experimental</a></li>
@@ -31,7 +31,7 @@
 							<li><a href="#">навантаження</a></li>
 							<li class="divider"></li>
 							<li class="nav-header">Додатково</li>
-							<li><a href="#">додати групове заняття</a></li>
+							<li><a href="#add_stream_modal" data-toggle="modal">додати потокове заняття</a></li>
 							<li><a href="#clear_schedule_modal" data-toggle="modal">повністю очистити розклад</a></li>
 							<li><a href="#help_modal" data-toggle="modal">правила користування</a></li>
 						</ul>
@@ -105,7 +105,7 @@
 									<div class="modal-body">
 										<div>
 											<label class="checkbox">
-												<input id="daycheck" name="daycheck" type="checkbox"> Кожен тиждень - парний/непарний
+												<input id="daycheck" type="checkbox"> Кожен тиждень - парний/непарний
 											</label>
 										</div>
 										<div class="modal_container">
@@ -113,25 +113,25 @@
 												<input id="day" type="text">
 												<input id="group" type="text">
 												<div class="ui-widget">
-													<label for="tag1">Предмет: </label>
-													<input id="tag1" type="text" name="predmet"/>
-													<button type="button" class="btn" value="#tag1"><i class="icon-remove"></i></button>
+													<label for="msub1">Предмет: </label>
+													<input id="msub1" type="text" name="predmet"/>
+													<button type="button" class="btn" value="#msub1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="ui-widget">
-													<label for="tag2">Викладач: </label>
-													<input id="tag2" type="text" name="teacher"/>
-													<button type="button" class="btn" value="#tag2"><i class="icon-remove"></i></button>
+													<label for="mteach1">Викладач: </label>
+													<input id="mteach1" type="text" name="teacher"/>
+													<button type="button" class="btn" value="#mteach1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="ui-widget">
-													<label for="tag3">Аудиторія: </label>
-													<input id="tag3" type="text" />
-													<button type="button" class="btn" value="#tag3"><i class="icon-remove"></i></button>
+													<label for="maud1">Аудиторія: </label>
+													<input id="maud1" type="text" />
+													<button type="button" class="btn" value="#maud1"><i class="icon-remove"></i></button>
 												</div>
 												<div>
-													<label for="sel1">Корпус:</label>
-													<select id="sel1">
+													<label for="msel1">Корпус:</label>
+													<select id="msel1">
 														{%for house in housings%}
-															<option>{{house}}</option>
+															<option value="{{house}}">{{house}}</option>
 														{%endfor%}
 													</select>
 												</div>
@@ -144,23 +144,23 @@
 											</div>
 											<div class="modal_cont2">
 												<div class="ui-widget">
-													<label for="tag4">Предмет: </label>
-													<input id="tag4" type="text" name="predmet"/>
-													<button type="button" class="btn" value="#tag4"><i class="icon-remove"></i></button>
+													<label for="msub2">Предмет: </label>
+													<input id="msub2" type="text" name="predmet"/>
+													<button type="button" class="btn" value="#msub2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="ui-widget">
-													<label for="tag5">Викладач: </label>
-													<input id="tag5" type="text" name="teacher"/>
-													<button type="button" class="btn" value="#tag5"><i class="icon-remove"></i></button>
+													<label for="mteach2">Викладач: </label>
+													<input id="mteach2" type="text" name="teacher"/>
+													<button type="button" class="btn" value="#mteach2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="ui-widget">
-													<label for="tag6">Аудиторія: </label>
-													<input id="tag6" type="text" />
-													<button type="button" class="btn" value="#tag6"><i class="icon-remove"></i></button>
+													<label for="maud2">Аудиторія: </label>
+													<input id="maud2" type="text" />
+													<button type="button" class="btn" value="#maud2"><i class="icon-remove"></i></button>
 												</div>
 												<div>
-													<label for="sel2">Корпус:</label>
-													<select id="sel2">
+													<label for="msel2">Корпус:</label>
+													<select id="msel2">
 														{%for house in housings%}
 															<option value="{{house}}">{{house}}</option>
 														{%endfor%}
@@ -176,8 +176,145 @@
 										</div>
 									</div>
 									<div class="modal-footer">
-										<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
-										<button class="btn btn-primary" id="sendsubject">Зберегти</button>
+										<div class="modal_message">
+											
+										</div>
+										<div class="modal_buttons">
+											<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
+											<button class="btn btn-primary" id="sendsubject">Зберегти</button>
+										</div>
+									</div>
+								</div>
+
+								<div id="add_stream_modal" class="modal hide fade">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h3>Потокове заняття</h3>
+									</div>
+									<div class="modal-body">
+										<div>
+											<div id="stream_day_div" class="btn-group">
+												<a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+													День
+													<span class="caret"></span>
+												</a>
+												<ul class="dropdown-menu">
+													<li><a href="#" value="1Понеділок">Понеділок</a></li>
+													<li><a href="#" value="2Вівторок">Вівторок</a></li>
+													<li><a href="#" value="3Середа">Середа</a></li>
+													<li><a href="#" value="4Четвер">Четвер</a></li>
+													<li><a href="#" value="5П'ятниця">П'ятниця</a></li>
+												</ul>
+											</div>
+											<div id="stream_pair_div" class="btn-group">
+												<a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+													Пара
+													<span class="caret"></span>
+												</a>
+												<ul class="dropdown-menu">
+													<li><a href="#" value="I">I</a></li>
+													<li><a href="#" value="II">II</a></li>
+													<li><a href="#" value="III">III</a></li>
+													<li><a href="#" value="IV">IV</a></li>
+													<li><a href="#" value="V">V</a></li>
+													<li><a href="#" value="VI">VI</a></li>
+												</ul>
+											</div>
+											<a href="#" id="groups-popover" class="btn btn-small btn-info">Групи</a>
+											<div id="groups-header-popover" class="hide">
+												<button id="btn-close-gr" type="button" class="close" aria-hidden="true">&times;</button>
+												<p>Групи</p>
+											</div>
+											<div id="groups-footer-popover" class="hide">
+												<div id="group_popover_buttons" class="btn-group btn-group-vertical" data-toggle="buttons-checkbox">
+													{%for group in groups%}
+														<button type="button" class="btn btn-primary" value="{{group}}">{{group}}</button>
+													{%endfor%}
+												</div>
+												<button id="stream_groups_ok" type="button" class="btn btn-success"><i class="icon-ok"></i>OK</button>
+											</div>
+											<div class="daycheck">
+												<label class="checkbox">
+													<input id="streamdaycheck" type="checkbox"> Кожен тиждень - парний/непарний
+												</label>
+											</div>
+										</div>
+										<div class="modal_container">
+											<div class="modal_cont1">
+												<input id="stream_day" type="text">
+												<input id="stream_pair" type="text">
+												<input id="stream_groups" type="text">
+												<div class="ui-widget">
+													<label for="ssub1">Предмет: </label>
+													<input id="ssub1" type="text" name="predmet"/>
+													<button type="button" class="btn" value="#ssub1"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="steach1">Викладач: </label>
+													<input id="steach1" type="text" name="teacher"/>
+													<button type="button" class="btn" value="#steach1"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="saud1">Аудиторія: </label>
+													<input id="saud1" type="text" />
+													<button type="button" class="btn" value="#saud1"><i class="icon-remove"></i></button>
+												</div>
+												<div>
+													<label for="ssel1">Корпус:</label>
+													<select id="ssel1">
+														{%for house in housings%}
+															<option value="{{house}}">{{house}}</option>
+														{%endfor%}
+													</select>
+												</div>
+												<div class="btn-group" id="stream-btn-group1" data-toggle="buttons-radio">
+													<button type="button" class="btn btn-small active" title="Звичайна пара" value="1"><i class="icon-ok"></i></button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+												</div>
+											</div>
+											<div class="modal_cont2">
+												<div class="ui-widget">
+													<label for="ssub2">Предмет: </label>
+													<input id="ssub2" type="text" name="predmet"/>
+													<button type="button" class="btn" value="#ssub2"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="steach2">Викладач: </label>
+													<input id="steach2" type="text" name="teacher"/>
+													<button type="button" class="btn" value="#steach2"><i class="icon-remove"></i></button>
+												</div>
+												<div class="ui-widget">
+													<label for="saud2">Аудиторія: </label>
+													<input id="saud2" type="text" />
+													<button type="button" class="btn" value="#saud2"><i class="icon-remove"></i></button>
+												</div>
+												<div>
+													<label for="ssel2">Корпус:</label>
+													<select id="ssel2">
+														{%for house in housings%}
+															<option value="{{house}}">{{house}}</option>
+														{%endfor%}
+													</select>
+												</div>
+												<div class="btn-group" id="stream-btn-group2" data-toggle="buttons-radio">
+													<button type="button" class="btn btn-small active" title="Звичайна пара" value="1"><i class="icon-ok"></i></button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<div class="modal_message">
+											
+										</div>
+										<div class="modal_buttons">
+											<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
+											<button class="btn btn-primary" id="send_stream_subject">Зберегти</button>
+										</div>
 									</div>
 								</div>
 
@@ -193,8 +330,13 @@
 										</label>
 									</div>
 									<div class="modal-footer">
-										<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
-										<button class="btn btn-primary" id="clear_schedule" disabled>Очистити</button>
+										<div class="modal_message">
+											
+										</div>
+										<div class="modal_buttons">
+											<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
+											<button class="btn btn-primary" id="clear_schedule" disabled>Очистити</button>
+										</div>
 									</div>
 								</div>
 
@@ -241,7 +383,12 @@
 										</div>
 									</div>
 									<div class="modal-footer">
-										<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">ОК</button>
+										<div class="modal_message">
+											
+										</div>
+										<div class="modal_buttons">
+											<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">ОК</button>
+										</div>
 									</div>
 								</div>
 							</div>

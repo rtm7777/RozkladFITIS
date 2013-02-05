@@ -2,7 +2,6 @@
 
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from django.core.exceptions import MultipleObjectsReturned
 import datetime
 from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule
 from django.utils import simplejson
@@ -123,6 +122,65 @@ def rozklad_content(request, group):
 
 	return render_to_response('rozklad_content.html', {'days': days, 'pairs': pairs, 'groups': groups_list, 'active_group': group, 'result': result, 'myurl': request.build_absolute_uri()})
 
+def rozklad_teacher(request):
+	teachers = Teacher.objects.order_by("teacher_last_name")
+	teachers_list = {}
+	for t in teachers:
+		teachers_list[t.teacher_last_name + "_" + t.teacher_first_name + "_" + t.teacher_middle_name] = t.teacher_last_name + " " + t.teacher_first_name[0] + ". " + t.teacher_middle_name[0] + "."
+	return render_to_response('rozklad_teacher.html', {'teachers': teachers_list})
+
+def rt_content(request, teacher):
+	tlfm = teacher.split("_")
+
+	teachers = Teacher.objects.order_by("teacher_last_name")
+	teachers_list = {}
+	for t in teachers:
+		teachers_list[t.teacher_last_name + "_" + t.teacher_first_name + "_" + t.teacher_middle_name] = t.teacher_last_name + " " + t.teacher_first_name[0] + ". " + t.teacher_middle_name[0] + "."
+	days = days_in_week
+	pairs = pair_in_day
+
+	result = {}
+	for d in days:
+		result[d] = {}
+		for p in pairs:
+			result[d][p]={}
+			result[d][p]['type'] = 0
+
+	period = ""
+
+	schedules = Schedule.objects.filter(teacher__teacher_last_name = tlfm[0], teacher__teacher_first_name = tlfm[1], teacher__teacher_middle_name = tlfm[2])
+	for schedule in schedules:
+		if schedule.pair.pair_period.period == 1:
+			period = ""
+		elif schedule.pair.pair_period.period == 2:
+			period = "2, 6, 10, 14"
+		elif schedule.pair.pair_period.period == 3:
+			period = "3, 7, 11, 15"
+		elif schedule.pair.pair_period.period ==4:
+			period = "4, 8, 12, 16"
+		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
+		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing) + ' ' + period
+		group = ' ' + schedule.group.group_name
+
+		if schedule.pair.pair_type.type_of_pair == u'кожен':
+			result[schedule.day.day][schedule.pair.pair_number]['1'] = subject + audience + group
+			result[schedule.day.day][schedule.pair.pair_number]['type'] = 1
+		elif schedule.pair.pair_type.type_of_pair == u'непарна':
+			result[schedule.day.day][schedule.pair.pair_number]['2'] = subject + audience + group
+			if result[schedule.day.day][schedule.pair.pair_number]['type'] == 0:
+				result[schedule.day.day][schedule.pair.pair_number]['type'] = 2
+			else:
+				result[schedule.day.day][schedule.pair.pair_number]['type'] = 4
+		elif schedule.pair.pair_type.type_of_pair == u'парна':
+			result[schedule.day.day][schedule.pair.pair_number]['3'] = subject + audience + group
+			if result[schedule.day.day][schedule.pair.pair_number]['type'] == 0:
+				result[schedule.day.day][schedule.pair.pair_number]['type'] = 3
+			else:
+				result[schedule.day.day][schedule.pair.pair_number]['type'] = 4
+
+	return render_to_response('rt_content.html', {'days': days, 'pairs': pairs, 'teachers': teachers_list, 'active_teacher': teacher, 'result': result, 'myurl': request.build_absolute_uri()})
+
+
 def rozklad_admin(request):
 	days = days_in_week
 	pairs = pair_in_day
@@ -232,9 +290,6 @@ def pair_add(request):
 
 	schedules = Schedule.objects.all()
 	pairs_objects = Pair.objects.filter(pair_number = pair)
-	pairs_objects1 = Pair.objects.filter(pair_number = pair, pair_type__type_of_pair = "кожен")
-	pairs_objects2 = Pair.objects.filter(pair_number = pair, pair_type__type_of_pair = "парна")
-	pairs_objects3 = Pair.objects.filter(pair_number = pair, pair_type__type_of_pair = "непарна")
 
 	def delete_objects(objects):
 		for schedule in schedules:
@@ -264,7 +319,6 @@ def pair_add(request):
 			audience1 = request.GET.get("audience1")
 			house1 = request.GET.get("house1")
 			period1 = request.GET.get("period1")
-		result = {}
 
 		if subject1:
 			s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
@@ -272,18 +326,13 @@ def pair_add(request):
 			s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
 			s_pair = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "кожен", pair_period__period=period1)
 
-
 			delete_objects(pairs_objects)
 
 			save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair)
 
-			result['sour'] = evenodd
-
 		else : 
 			delete_objects(pairs_objects)
-			result['sour'] = evenodd
 
-		json = jquery+'('+simplejson.dumps(result)+')'
 	elif evenodd == "false":
 		subject1 = request.GET.get("subject1")
 		subject2 = request.GET.get("subject2")
@@ -301,8 +350,6 @@ def pair_add(request):
 			house2 = request.GET.get("house2")
 			period2 = request.GET.get("period2")
 
-		result = {}
-		
 		if subject1 and subject2:
 			s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
 			s_audience = Audience.objects.get(number_of_audience = audience1)
@@ -313,25 +360,10 @@ def pair_add(request):
 			s_subject2 = Subject.objects.get(subject_name = subject2[0], subject_type__type_of_subject = subject2[1])
 			s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
 
-			try:
-				delete_objects(pairs_objects3)
-			except:
-				pass
-			try:
-				delete_objects(pairs_objects2)
-			except:
-				pass
-			try:
-				delete_objects(pairs_objects1)
-			except:
-				pass
+			delete_objects(pairs_objects)
 
 			save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair1)
 			save_schedule(s_day, s_group, s_teacher2, s_audience2, s_subject2, s_pair2)
-
-			result['sour'] = evenodd
-
-			json = jquery+'('+simplejson.dumps(result)+')'
 
 		elif not subject2 and subject1:
 			s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
@@ -339,13 +371,8 @@ def pair_add(request):
 			s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
 			s_pair1 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "непарна", pair_period__period = period1)
 
-			delete_objects(pairs_objects2)
-			delete_objects(pairs_objects1)
+			delete_objects(pairs_objects)
 			save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair1)
-
-			result['sour'] = evenodd
-
-			json = jquery+'('+simplejson.dumps(result)+')'
 
 		elif not subject1 and subject2:
 			s_teacher2 = Teacher.objects.get(teacher_last_name = teacher2[0], teacher_first_name = teacher2[1], teacher_middle_name = teacher2[2])
@@ -353,20 +380,108 @@ def pair_add(request):
 			s_subject2 = Subject.objects.get(subject_name = subject2[0], subject_type__type_of_subject = subject2[1])
 			s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
 
-			delete_objects(pairs_objects3)
-			delete_objects(pairs_objects1)
+			delete_objects(pairs_objects)
+
 			save_schedule(s_day, s_group, s_teacher2, s_audience2, s_subject2, s_pair2)
-
-			result['sour'] = evenodd
-
-			json = jquery+'('+simplejson.dumps(result)+')'
 
 		else:
 			delete_objects(pairs_objects)
+	result = {}
+	result['sour'] = evenodd
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
 
-			result['sour'] = evenodd
-			json = jquery+'('+simplejson.dumps(result)+')'
+def pair_stream_add(request):
+	groups = request.GET.get("groups")[:-1].split(",")
+	day = request.GET.get("day")
+	pair = request.GET.get("pair")
+	jquery = request.GET.get("callback")
+	evenodd = request.GET.get("evenodd")
 
+	schedules = Schedule.objects.all()
+
+	def save_schedule(day, group, teacher, audience, subject, pair):
+		p1 = Schedule(day = day,
+					group = group,
+					teacher = teacher,
+					audience = audience,
+					subject = subject,
+					pair = pair)
+		p1.save()
+
+	s_day = Day.objects.get(day=day)
+
+	pair_count = 0
+	for g in groups:
+		pair_count += Schedule.objects.filter(group__group_name = g, day__day = day, pair__pair_number = pair).count()
+
+	if not pair_count:
+		for g in groups:
+			s_group = Group.objects.get(group_name=g)
+			if evenodd == "true":
+				subject1 = request.GET.get("subject1")
+				subject1 = subject1.split(" - ")
+				teacher1 = request.GET.get("teacher1").split(" ")
+				audience1 = request.GET.get("audience1")
+				house1 = request.GET.get("house1")
+				period1 = request.GET.get("period1")
+
+				s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
+				s_audience = Audience.objects.get(number_of_audience = audience1)
+				s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
+				s_pair = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "кожен", pair_period__period=period1)
+
+				save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair)
+
+			elif evenodd == "false":
+				subject1 = request.GET.get("subject1")
+				subject2 = request.GET.get("subject2")
+				subject1 = subject1.split(" - ")
+				teacher1 = request.GET.get("teacher1").split(" ")
+				audience1 = request.GET.get("audience1")
+				house1 = request.GET.get("house1")
+				period1 = request.GET.get("period1")
+				subject2 = subject2.split(" - ")
+				teacher2 = request.GET.get("teacher2").split(" ")
+				audience2 = request.GET.get("audience2")
+				house2 = request.GET.get("house2")
+				period2 = request.GET.get("period2")
+				
+				if subject1 and subject2:
+					s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
+					s_audience = Audience.objects.get(number_of_audience = audience1)
+					s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
+					s_pair1 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "непарна", pair_period__period= period1)
+					s_teacher2 = Teacher.objects.get(teacher_last_name = teacher2[0], teacher_first_name = teacher2[1], teacher_middle_name = teacher2[2])
+					s_audience2 = Audience.objects.get(number_of_audience = audience2)
+					s_subject2 = Subject.objects.get(subject_name = subject2[0], subject_type__type_of_subject = subject2[1])
+					s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
+
+					save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair1)
+					save_schedule(s_day, s_group, s_teacher2, s_audience2, s_subject2, s_pair2)
+
+				elif not subject2 and subject1:
+					s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
+					s_audience = Audience.objects.get(number_of_audience = audience1)
+					s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
+					s_pair1 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "непарна", pair_period__period = period1)
+
+					save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair1)
+
+				elif not subject1 and subject2:
+					s_teacher2 = Teacher.objects.get(teacher_last_name = teacher2[0], teacher_first_name = teacher2[1], teacher_middle_name = teacher2[2])
+					s_audience2 = Audience.objects.get(number_of_audience = audience2)
+					s_subject2 = Subject.objects.get(subject_name = subject2[0], subject_type__type_of_subject = subject2[1])
+					s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
+
+					save_schedule(s_day, s_group, s_teacher2, s_audience2, s_subject2, s_pair2)
+		result = {}
+		result['sour'] = evenodd
+		json = jquery+'('+simplejson.dumps(result)+')'
+	else:
+		result = {}
+		result['sour'] = evenodd
+		json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
 
 def getsubjsingle(request):
@@ -408,18 +523,16 @@ def getsubjsmodal(request):
 	pair = day_pair[1]
 	result = {}
 	res = []
-	sub = {}
-	try:
-		schedule = Schedule.objects.get(group__group_name=group_val, day__day=day, pair__pair_number = pair)
+	
+	schedules = Schedule.objects.filter(group__group_name = group_val, day__day = day, pair__pair_number = pair)
+	for schedule in schedules:
+		sub = {}
 		sub["subject"] = schedule.subject.subject_name + " - " + schedule.subject.subject_type.type_of_subject
 		sub["teacher"] = schedule.teacher.teacher_last_name + " " + schedule.teacher.teacher_first_name + " " + schedule.teacher.teacher_middle_name
 		sub["audience"] = schedule.audience.number_of_audience
 		sub["house"] = schedule.audience.housing.number_of_housing
 		sub["period"] = schedule.pair.pair_period.period
 		sub["pair_type"] = schedule.pair.pair_type.type_of_pair
-		sub["amount"] = "true"
-		res.append(sub)
-	except MultipleObjectsReturned:
 		sub["amount"] = "false"
 		res.append(sub)
 	result['sources'] = res

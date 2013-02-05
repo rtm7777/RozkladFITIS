@@ -1,7 +1,6 @@
 
-
 $(function() {
-  $("#tag1, #tag4").autocomplete({
+  $("#msub1, #msub2, #ssub1, #ssub2").autocomplete({
     source: function(request,response) {
       $.ajax({
         url: "/ac",
@@ -22,7 +21,7 @@ $(function() {
 });
 
 $(function() {
-  $("#tag2, #tag5").autocomplete({
+  $("#mteach1, #mteach2, #steach1, #steach2").autocomplete({
     source: function(request,response) {
       $.ajax({
         url: "/tch",
@@ -43,13 +42,13 @@ $(function() {
 });
 
 $(function() {
-  $("#tag3").autocomplete({
+  $("#maud1").autocomplete({
     source: function(request,response) {
       $.ajax({
         url: "/au",
         dataType: "jsonp",
         data: {auditory: request.term,
-              korpus: $("#sel1").val()},
+              korpus: $("#msel1").val()},
         success: function(data) {
           response($.map(data.sources, function(item) {
             return {
@@ -65,13 +64,13 @@ $(function() {
 });
 
 $(function() {
-  $("#tag6").autocomplete({
+  $("#saud1").autocomplete({
     source: function(request,response) {
       $.ajax({
         url: "/au",
         dataType: "jsonp",
         data: {auditory: request.term,
-              korpus: $("#sel2").val()},
+              korpus: $("#ssel1").val()},
         success: function(data) {
           response($.map(data.sources, function(item) {
             return {
@@ -85,70 +84,208 @@ $(function() {
     minLength: 1,
   });
 });
+
+$(function() {
+  $("#maud2").autocomplete({
+    source: function(request,response) {
+      $.ajax({
+        url: "/au",
+        dataType: "jsonp",
+        data: {auditory: request.term,
+              korpus: $("#msel2").val()},
+        success: function(data) {
+          response($.map(data.sources, function(item) {
+            return {
+              label: item.number,
+              value: item.number
+            }
+          }));
+        }
+      });
+    },
+    minLength: 1,
+  });
+});
+
+$(function() {
+  $("#saud2").autocomplete({
+    source: function(request,response) {
+      $.ajax({
+        url: "/au",
+        dataType: "jsonp",
+        data: {auditory: request.term,
+              korpus: $("#ssel2").val()},
+        success: function(data) {
+          response($.map(data.sources, function(item) {
+            return {
+              label: item.number,
+              value: item.number
+            }
+          }));
+        }
+      });
+    },
+    minLength: 1,
+  });
+});
+
+function SendSubjectData() {
+  $.ajax({
+    url: "/sendsubj",
+    dataType: "jsonp",
+    data: {
+      para: $("#day").val(),
+      group: $("#group").val(),
+      evenodd: $("#daycheck").prop("checked"),
+      subject1: $("#msub1").val(),
+      teacher1: $("#mteach1").val(),
+      audience1: $("#maud1").val(),
+      house1: $("#msel1").val(),
+      period1: $('#btn-group1 button.active').val(),
+      subject2: $("#msub2").val(),
+      teacher2: $("#mteach2").val(),
+      audience2: $("#maud2").val(),
+      house2: $("#msel2").val(),
+      period2: $('#btn-group2 button.active').val(),
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      ShowMessage("success", "Предмет додано");
+      $('#subject_add_modal').modal('hide');
+      $("#load_animation").hide("fast");
+      $.ajax({
+        url: "/getsubjsingle",
+        dataType: "jsonp",
+        data: {
+          para: $("#day").val(),
+          group: $("#group").val(),
+        },
+        beforeSend: function() {
+          $("#load_animation").show("fast");
+        },
+        success: function(data) {
+          var id_day = $("#day").val().charAt(0);
+          var id_pair = $("#day").val().split(' ');
+          $("#"+id_day+"_"+id_pair[1]+" td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
+          $.map(data.sources, function(item) {
+            if (item.tupe == "кожен") {
+              $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
+            } else if (item.tupe == "непарна") {
+              $('#'+item.daypair+' td p:first-child').removeClass("null").text(item.subject);
+            } else if (item.tupe == "парна") {
+              $('#'+item.daypair+' td p:last-child').removeClass("null").text(item.subject);
+            };
+          });
+          $("#load_animation").hide("fast");
+        },
+        error: function() {
+          ShowMessage("error", "Виникла помилка при відображенні")
+          $("#load_animation").hide("fast");
+        }
+      });
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка при додаванні занять");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
+
+function SendStreamSubjectData() {
+  $.ajax({
+    url: "/sendstreamsubj",
+    dataType: "jsonp",
+    data: {
+      day: $("#stream_day").val(),
+      pair: $("#stream_pair").val(),
+      groups: $("#stream_groups").val(),
+      evenodd: $("#streamdaycheck").prop("checked"),
+      subject1: $("#ssub1").val(),
+      teacher1: $("#steach1").val(),
+      audience1: $("#saud1").val(),
+      house1: $("#ssel1").val(),
+      period1: $('#stream-btn-group1 button.active').val(),
+      subject2: $("#ssub2").val(),
+      teacher2: $("#steach2").val(),
+      audience2: $("#saud2").val(),
+      house2: $("#ssel2").val(),
+      period2: $('#stream-btn-group2 button.active').val(),
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function() {
+      $("#add_stream_modal").modal('hide');
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка при додаванні занять");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
 
 $(function() {
   $("#sendsubject").click(function() {
-    $.ajax({
-      url: "/sendsubj",
-      dataType: "jsonp",
-      data: {
-        para: $("#day").val(),
-        group: $("#group").val(),
-        evenodd: $("#daycheck").prop("checked"),
-        subject1: $("#tag1").val(),
-        teacher1: $("#tag2").val(),
-        audience1: $("#tag3").val(),
-        house1: $("#sel11").val(),
-        period1: $('#btn-group1 button.active').val(),
-        subject2: $("#tag4").val(),
-        teacher2: $("#tag5").val(),
-        audience2: $("#tag6").val(),
-        house2: $("#sel12").val(),
-        period2: $('#btn-group2 button.active').val(),
-      },
-      beforeSend: function() {
-        $("#load_animation").show("fast");
-      },
-      success: function(data) {
-        ShowMessage("success", "Предмет додано");
-        $("#load_animation").hide("fast");
-        $.ajax({
-          url: "/getsubjsingle",
-          dataType: "jsonp",
-          data: {
-            para: $("#day").val(),
-            group: $("#group").val(),
-          },
-          beforeSend: function() {
-            $("#load_animation").show("fast");
-          },
-          success: function(data) {
-            var id_day = $("#day").val().charAt(0);
-            var id_pair = $("#day").val().split(' ');
-            $("#"+id_day+"_"+id_pair[1]+" td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
-            $.map(data.sources, function(item) {
-              if (item.tupe == "кожен") {
-                $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
-              } else if (item.tupe == "непарна") {
-                $('#'+item.daypair+' td p:first-child').removeClass("null").text(item.subject);
-              } else if (item.tupe == "парна") {
-                $('#'+item.daypair+' td p:last-child').removeClass("null").text(item.subject);
-              };
-            });
-            $("#load_animation").hide("fast");
-          },
-          error: function() {
-            ShowMessage("error", "Виникла помилка при відображенні")
-            $("#load_animation").hide("fast");
-          }
-        });
-      },
-      error: function() {
-        ShowMessage("error", "Виникла помилка при додаванні занять");
-        $("#load_animation").hide("fast");
-      }
-    });
-    $('#subject_add_modal').modal('hide');
+    if ($("#daycheck").prop("checked")) {
+      if ($("#msub1").val() !== "") {
+        if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
+          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");
+        } else {
+          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");
+        };
+      } else {
+        ShowModalMessage("#subject_add_modal", "Заповныть всы поля");
+      }; 
+    } else {
+      errors1 = false;
+      errors2 = false;
+      if ($("#msub1").val() !== "") {
+        if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
+          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");e
+          errors1 = true;
+        };
+      };
+      if ($("#msub2").val() !== "") {
+        if ($("#mteach2").val() == "" || $("#maud2").val() == "") {
+          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");;
+          errors2 = true;
+        };
+      };
+      if (errors1 !== true && errors2 !== true) {
+        SendSubjectData();
+      };
+    };
+  });
+});
+
+$(function() {
+  $("#send_stream_subject").click(function() {
+    errors1 = false;
+    errors2 = false;
+    if ($("#stream_groups").val() == "" || $("#stream_pair").val() == "" || $("#stream_day").val() == "") {
+      errors1 = true;
+    };
+    if ($("#streamdaycheck").prop("checked")) {
+      if ($("#ssub1").val() == "" || $("#steach1").val() == "" || $("#saud1").val() == "") {
+        errors1 = true;
+      };
+    } else {
+      if ($("#ssub1").val() == "" || $("#steach1").val() == "" || $("#saud1").val() == "") {
+        errors1 = true;
+      };
+      if ($("#ssub2").val() == "" || $("#steach2").val() == "" || $("#saud2").val() == "") {
+        errors2 = true;
+      };
+    };
+    if (errors1 !== true && errors2 !== true) {
+      SendStreamSubjectData();
+    } else {
+      ShowModalMessage("#add_stream_modal", "Заповныть всы поля");
+    };
+    
   });
 });
 
@@ -195,26 +332,48 @@ function ShowMessage(type, message) { // Показ повідомлень
   $("#alert_"+type).slideUp();
 };
 
-function ClearSubModal() {
+//Повыдомлення в модальному выкны
+function ShowModalMessage(modal, message) {
+  $(modal+" .modal-footer .modal_message").text(message);
+  $(modal+" .modal-footer .modal_message").show("fast").delay(1700);
+  $(modal+" .modal-footer .modal_message").hide("fast");
+};
+
+//Очистка модального вікна
+function ClearSubModal() { 
   $("#subject_add_modal .modal_container div div input").val('');
   $("#subject_add_modal .modal_container div .btn-group button").removeClass("active");
   $("#subject_add_modal .modal_container div .btn-group button:first-child").addClass("active");
+  $("#msel1, #ssel1, #msel2, #ssel2").val("1");
+};
+
+//Установка кнопки періоду
+//Потрібно переписать для підтримки IE8
+function SetPeriodActive(evenodd, period) {
+  if (evenodd == 1) {
+    $(".modal_cont1 .btn-group button").removeClass("active");
+    $(".modal_cont1 .btn-group button:nth-child("+period+")").addClass("active");
+  } else if (evenodd == 2) {
+    $(".modal_cont2 .btn-group button").removeClass("active");
+    $(".modal_cont2 .btn-group button:nth-child("+period+")").addClass("active");
+  };
+  
 }
 
 function DisableModalOdd() {
-  $("#tag4").prop({disabled: true});
-  $("#tag5").prop({disabled: true});
-  $("#tag6").prop({disabled: true});
-  $("#sel12").prop({disabled: true});
+  $("#msub2, #ssub2").prop({disabled: true});
+  $("#mteach2, #steach2").prop({disabled: true});
+  $("#maud2, #saud2").prop({disabled: true});
+  $("#msel2, #ssel2").prop({disabled: true});
   $(".modal_container .modal_cont2 div button").prop({disabled: true});
   $(".modal_container .modal_cont2 div label").addClass("label_disabled");
 }
 
 function EnableModalOdd() {
-  $("#tag4").prop({disabled: false});
-  $("#tag5").prop({disabled: false});
-  $("#tag6").prop({disabled: false});
-  $("#sel12").prop({disabled: false});
+  $("#msub2, #ssub2").prop({disabled: false});
+  $("#mteach2, #steach2").prop({disabled: false});
+  $("#maud2, #saud2").prop({disabled: false});
+  $("#msel2, #ssel2").prop({disabled: false});
   $(".modal_container .modal_cont2 div button").prop({disabled: false});
   $(".modal_container .modal_cont2 div label").removeClass("label_disabled");
 }
@@ -239,21 +398,33 @@ $(document).ready(function() {
             $("#load_animation").show("fast");
           },
           success: function(data) {
+            ClearSubModal();
             $.map(data.sources, function(item) {
-              if (item.amount == "true") {
                 if (item.pair_type == "кожен") {
                   $("#daycheck").prop({checked: true});
+                  $("#msub1").val(item.subject);
+                  $("#mteach1").val(item.teacher);
+                  $("#maud1").val(item.audience);
+                  $("#msel1").val(item.house);
+                  SetPeriodActive(1, item.period);
                   DisableModalOdd();
-                } else {
+                } else if (item.pair_type == "парна") {
                   $("#daycheck").prop({checked: false});
+                  $("#msub2").val(item.subject);
+                  $("#mteach2").val(item.teacher);
+                  $("#maud2").val(item.audience);
+                  $("#msel2").val(item.house);
+                  SetPeriodActive(2, item.period);
+                  EnableModalOdd();
+                } else if (item.pair_type == "непарна") {
+                  $("#daycheck").prop({checked: false});
+                  $("#msub1").val(item.subject);
+                  $("#mteach1").val(item.teacher);
+                  $("#maud1").val(item.audience);
+                  $("#msel1").val(item.house);
+                  SetPeriodActive(1, item.period);
                   EnableModalOdd();
                 };
-                $("#tag1").val(item.subject);
-                $("#tag2").val(item.teacher);
-                $("#tag3").val(item.audience);
-              } else if (item.tupe == "непарна") {
-                $('#'+item.daypair+' .subject_content p:first-child').removeClass("null").text(item.subject);
-              }
             });
             $('#subject_add_modal').modal('show');
             $("#load_animation").hide("fast");
@@ -265,7 +436,9 @@ $(document).ready(function() {
           }
         });
       } else {
+        $("#daycheck").prop({checked: false});
         ClearSubModal();
+        EnableModalOdd();
         $('#subject_add_modal').modal('show');
         $("#load_animation").hide("fast");
       };
@@ -335,6 +508,14 @@ $(document).ready(function() {
     };
   });
 
+  $("#streamdaycheck").click(function() {
+    if ($("#streamdaycheck").is(':checked')) {
+      DisableModalOdd();
+    } else {
+      EnableModalOdd()
+    };
+  });
+
   $("#clearcheck").change(function() { //Провірка згоди на очистку розкладу
     if ($('#clearcheck').is(':checked')) {
         $("#clear_schedule").prop({disabled: false});
@@ -354,4 +535,38 @@ $(document).ready(function() {
     $("#"+tab.attr("value")).slideDown("slow");
   });
 
+  $("#stream_day_div ul li a").click(function() {
+    $("#stream_day_div>a").html($(this).text()+" <span class='caret'></span>");
+    $("#stream_day").val($(this).attr("value"));
+  });
+
+  $("#stream_pair_div ul li a").click(function() {
+    $("#stream_pair_div>a").html($(this).text()+" Пара <span class='caret'></span>");
+    $("#stream_pair").val($(this).attr("value"));
+  });
+
+  $('#groups-popover').popover({
+    trigger: 'manual',
+    html: true,
+    placement: 'bottom',
+    title: $('#groups-header-popover').html(),
+    content: $('#groups-footer-popover').html()
+  }).click(function (e) {
+    e.preventDefault();
+    $(this).popover('show');
+  });
+
+  $(document).on("click", "#btn-close-gr", function() {
+    $('#groups-popover').popover('hide');
+  });
+
+  $(document).on("click", "#stream_groups_ok", function() {
+    var data = "";
+    $('#group_popover_buttons .btn.active').each(function() {
+      data += $(this).attr("value")+",";
+    });
+    $("#stream_groups").val(data);
+    $('#groups-popover').popover('hide');
+  });
 });
+

@@ -1,0 +1,40 @@
+{%extends "header.html"%}
+
+{% load extras %}
+
+{%block title%}Розклад викладачів{%endblock%}
+
+{%block topnavleft%}
+<li><a href="/rozklad/">Розклад груп</a></li>
+<li class="active"><a href="/rozklad_teacher/">Розклад викладачів</a></li>
+<li><a href="/forum/">Форум</a></li>
+<li><a href="/about/">Про сайт</a></li>
+<li><a href="/experimental/">Experimental</a></li>
+{%endblock%}
+
+{%block topnavadmin%}
+<li class="dropdown">
+{%endblock%}
+
+{%block content%}
+
+<div class="row">
+	<div class="span3">
+		<blockquote>
+			<p>Викладачі</p>
+		</blockquote>
+		<ul class="nav nav-tabs nav-stacked nav_tab_group">
+			{%for key, value in teachers.items|sort%}
+				<li><a href="/rozklad_teacher/{{key}}" title="{{key}}">{{value}}</a></li>
+			{%endfor%}
+		</ul>
+	</div>
+	<div class="span9">
+		<div class="hero-unit">
+			<h1>Виберіть викладача</h1>
+			<p></p>
+		</div>
+	</div>
+</div>
+
+{%endblock%}
