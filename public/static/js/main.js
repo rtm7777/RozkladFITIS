@@ -152,39 +152,44 @@ function SendSubjectData() {
       $("#load_animation").show("fast");
     },
     success: function(data) {
-      ShowMessage("success", "Предмет додано");
-      $('#subject_add_modal').modal('hide');
-      $("#load_animation").hide("fast");
-      $.ajax({
-        url: "/getsubjsingle",
-        dataType: "jsonp",
-        data: {
-          para: $("#day").val(),
-          group: $("#group").val(),
-        },
-        beforeSend: function() {
-          $("#load_animation").show("fast");
-        },
-        success: function(data) {
-          var id_day = $("#day").val().charAt(0);
-          var id_pair = $("#day").val().split(' ');
-          $("#"+id_day+"_"+id_pair[1]+" td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
-          $.map(data.sources, function(item) {
-            if (item.tupe == "кожен") {
-              $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
-            } else if (item.tupe == "непарна") {
-              $('#'+item.daypair+' td p:first-child').removeClass("null").text(item.subject);
-            } else if (item.tupe == "парна") {
-              $('#'+item.daypair+' td p:last-child').removeClass("null").text(item.subject);
-            };
-          });
-          $("#load_animation").hide("fast");
-        },
-        error: function() {
-          ShowMessage("error", "Виникла помилка при відображенні")
-          $("#load_animation").hide("fast");
-        }
-      });
+      if (data.errors !== "true") {
+        $.ajax({
+          url: "/getsubjsingle",
+          dataType: "jsonp",
+          data: {
+            para: $("#day").val(),
+            group: $("#group").val(),
+          },
+          beforeSend: function() {
+            $("#load_animation").show("fast");
+          },
+          success: function(data) {
+            var id_day = $("#day").val().charAt(0);
+            var id_pair = $("#day").val().split(' ');
+            $("#"+id_day+"_"+id_pair[1]+" td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
+            $.map(data.sources, function(item) {
+              if (item.tupe == "кожен") {
+                $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
+              } else if (item.tupe == "непарна") {
+                $('#'+item.daypair+' td p:first-child').removeClass("null").text(item.subject);
+              } else if (item.tupe == "парна") {
+                $('#'+item.daypair+' td p:last-child').removeClass("null").text(item.subject);
+              };
+            });
+            $("#load_animation").hide("fast");
+          },
+          error: function() {
+            ShowMessage("error", "Виникла помилка при відображенні")
+            $("#load_animation").hide("fast");
+          }
+        });
+        $("#subject_add_modal").modal('hide');
+        $("#load_animation").hide("fast");
+        ShowMessage("success", "dodano");
+      } else {
+        $("#load_animation").hide("fast");
+        ShowModalMessage("#subject_add_modal", data.errors_message);
+      };
     },
     error: function() {
       ShowMessage("error", "Виникла помилка при додаванні занять");
@@ -229,34 +234,30 @@ function SendStreamSubjectData() {
 
 $(function() {
   $("#sendsubject").click(function() {
+    errors = false;
     if ($("#daycheck").prop("checked")) {
       if ($("#msub1").val() !== "") {
         if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");
-        } else {
-          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");
+          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");
+          errors = true;
         };
-      } else {
-        ShowModalMessage("#subject_add_modal", "Заповныть всы поля");
       }; 
     } else {
-      errors1 = false;
-      errors2 = false;
       if ($("#msub1").val() !== "") {
         if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");e
-          errors1 = true;
+          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");e
+          errors = true;
         };
       };
       if ($("#msub2").val() !== "") {
         if ($("#mteach2").val() == "" || $("#maud2").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповныть всы поля");;
-          errors2 = true;
+          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");;
+          errors = true;
         };
       };
-      if (errors1 !== true && errors2 !== true) {
-        SendSubjectData();
-      };
+    };
+    if (errors !== true) {
+      SendSubjectData();
     };
   });
 });
@@ -283,7 +284,7 @@ $(function() {
     if (errors1 !== true && errors2 !== true) {
       SendStreamSubjectData();
     } else {
-      ShowModalMessage("#add_stream_modal", "Заповныть всы поля");
+      ShowModalMessage("#add_stream_modal", "Заповніть всі поля");
     };
     
   });
@@ -332,9 +333,9 @@ function ShowMessage(type, message) { // Показ повідомлень
   $("#alert_"+type).slideUp();
 };
 
-//Повыдомлення в модальному выкны
+//Повыдомлення в модальному вікні
 function ShowModalMessage(modal, message) {
-  $(modal+" .modal-footer .modal_message").text(message);
+  $(modal+" .modal-footer .modal_message p b").text(message);
   $(modal+" .modal-footer .modal_message").show("fast").delay(1700);
   $(modal+" .modal-footer .modal_message").hide("fast");
 };
