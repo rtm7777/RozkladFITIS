@@ -1,3 +1,30 @@
+function getCookie(name) { // Отримання значення csrftoken-ена 
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({    // Установка X-CSRFToken заголовку в Ajax запит
+    crossDomain: false,
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
 
 $(function() {
   $("#msub1, #msub2, #ssub1, #ssub2").autocomplete({
@@ -129,7 +156,7 @@ $(function() {
   });
 });
 
-function SendSubjectData() {
+function SendSubjectData() {  // Відправка Ajax на сервер для додавання заняття
   $.ajax({
     url: "/sendsubj",
     dataType: "jsonp",
@@ -198,7 +225,7 @@ function SendSubjectData() {
   });
 };
 
-function SendStreamSubjectData() {
+function SendStreamSubjectData() { // Відправка Ajax на сервер для додавання потокового заняття
   $.ajax({
     url: "/sendstreamsubj",
     dataType: "jsonp",
@@ -233,7 +260,7 @@ function SendStreamSubjectData() {
 };
 
 $(function() {
-  $("#sendsubject").click(function() {
+  $("#sendsubject").click(function() { // Провірка вікна дод. заняття на заповненість
     errors = false;
     if ($("#daycheck").prop("checked")) {
       if ($("#msub1").val() !== "") {
@@ -263,7 +290,7 @@ $(function() {
 });
 
 $(function() {
-  $("#send_stream_subject").click(function() {
+  $("#send_stream_subject").click(function() { // Провірка вікна дод. поток. заняття на заповненість
     errors1 = false;
     errors2 = false;
     if ($("#stream_groups").val() == "" || $("#stream_pair").val() == "" || $("#stream_day").val() == "") {
@@ -290,35 +317,20 @@ $(function() {
   });
 });
 
-$(function() {
+$(function() { // Функція для входу користувача (Ajax)
   $("#send_login").click(function() {
-    $.post('/login_ajax', {username: $("#login").val(), password: $("#password").val()})
-      .done(function(data) {
-        if (data.logined == "true") {
-          window.location.reload()
-        } else {
-          ShowMessage('error', 'Введено некоректні дані')
-        };
-      })
-      .fail(function() {ShowMessage('error', 'Виникла помолка в процесі авторизації')})
-
+    $.ajax({
+      type:"POST",
+      url:"/login",
+      data: {'login': $("#login").val(),
+             'password': $("#password").val()},
+      success: function(data){
+        alert("sdgsd");
+      }
+    });
   });
 });
 
-$(function() {
-  $("#send_logout").click(function() {
-    $.post('/logout_ajax')
-      .done(function(data) {
-        if (data.logout == "true") {
-          window.location.reload()
-        } else {
-          ShowMessage('error', 'Введено некоректні дані')
-        };
-      })
-      .fail(function() {ShowMessage('error', 'Виникла помолка в процесі авторизації')})
-
-  });
-});
 
 $(function() { //Очистка полів введення у вікні додавання заняття
   $(".modal_container div div button").click(function() {

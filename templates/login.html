@@ -17,18 +17,21 @@
 {%block content%}
 <div class="login-form">
 	<h2>Увійдіть щоб отримати доступ</h2>
-	<fieldset>
+	
+	<form id="login_form" action="" method="post"> 
 		{% csrf_token %}
 		<div class="clearfix">
-			<input id="login" type="text" placeholder="Логін">
+			<input id="login" name="username" type="text" placeholder="Логін" value="">
 		</div>
 		<div class="clearfix">
-			<input id="password" type="password" placeholder="Пароль">
+			<input id="password" name="password" type="password" placeholder="Пароль" value="">
 		</div>
-		<button id="send_login" class="btn primary">Ввійти</button>
+		<input id="send_login" class="btn primary" value="Ввійти"> 
+	</form>
+
 <p style="margin: 0.4em;">
-    <a href="{% url socialauth_begin 'facebook' %}">Enter Facebook</a>
+    <a href="{% url socialauth_begin 'facebook' %}?next=/forum/">Enter Facebook</a>
 </p>
-	</fieldset>
+
 </div>
 {%endblock%}

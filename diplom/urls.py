@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import patterns, include, url
+from django.contrib.auth.views import login, logout
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -15,8 +16,8 @@ urlpatterns = patterns('',
 	(r'getsubjs$', 'diplom.views.group_subjs'), #повертає всі пари для групи
 	(r'getsubjsingle$', 'diplom.views.getsubjsingle'), #повертає предмети для певного дня і пари
 	(r'getsubjsmodal$', 'diplom.views.getsubjsmodal'), #повертає предмети пари і вводить їх в модальне вікно
-	(r'login_ajax$', 'diplom.views.login_ajax'),
-	(r'logout_ajax$', 'diplom.views.logout_ajax'),
+	(r'login$', 'diplom.views.ajax_login'),
+	(r'^logout/$', logout, {'template_name': 'login.html'}),
 	# Uncomment the admin/doc line below to enable admin documentation:
 	# url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

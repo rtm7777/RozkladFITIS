@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 import datetime
 from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule
 from django.utils import simplejson
 from django.contrib import auth
+from django.views.decorators.csrf import csrf_protect
 
 
 days_in_week = [u'1Понеділок', u'2Вівторок', u'3Середа', u'4Четвер', u"5П'ятниця"]
@@ -17,26 +18,22 @@ for house in Housing.objects.all():
 def main(request):
 	return render_to_response('main.html')
 
-def login_ajax(request):
-	username = request.POST.get('username')
-	password = request.POST.get('password')
-	user = auth.authenticate(username=username, password=password)
+@csrf_protect
+def ajax_login(request):
 	result = {}
-	if user is not None and user.is_active:
-		auth.login(request, user)
-		result['logined'] = "true"
-		json = simplejson.dumps(result)
-	else:
-		result['logined'] = "false"
-		json = simplejson.dumps(result)
-	return HttpResponse(json, mimetype = 'application/json')
-
-def logout_ajax(request):
-	auth.logout(request)
-	result = {}
-	result['logout'] = "true"
-	json = simplejson.dumps(result)
-	return HttpResponse(json, mimetype = 'application/json')
+	if request.method == 'POST':
+		username = request.POST.get('login')
+		password = request.POST.get('password')
+		user = auth.authenticate(username=username, password=password)
+		if user is not None and user.is_active:
+			auth.login(request, user)
+			result['sources'] = "1"
+			json = simplejson.dumps(result)
+			return HttpResponse(json, mimetype = 'application/json')
+		else:
+			result['sources'] = username
+			json = simplejson.dumps(result)
+			return HttpResponse(json, mimetype = 'application/json')
 
 def rozklad(request):
 	groups = Group.objects.order_by("group_name")
@@ -293,8 +290,6 @@ def pair_add(request):
 
 	pair_add.errors = ""
 	pair_add.errors_message = "Некорректно введено:"
-
-
 
 	def delete_objects(objects):
 		for schedule in schedules:
