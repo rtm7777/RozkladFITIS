@@ -1,8 +1,9 @@
+<!doctype html>
 <html>
-<head>
-<title>first page</title>
-</head>
-<body>
-<p>hello word</p>
-</body>
+	<head>
+		<title>{%block title%}{%endblock%}</title>
+	</head>
+	<body>
+		<p>hello</p>
+	</body>
 </html>
