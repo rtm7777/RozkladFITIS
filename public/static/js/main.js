@@ -88,12 +88,10 @@ function SendSubjectData() {  // Відправка Ajax на сервер дл�
       subject1: $("#msub1").val(),
       teacher1: $("#mteach1").val(),
       audience1: $("#maud1").val(),
-      house1: $("#msel1").val(),
       period1: $('#btn-group1 button.active').val(),
       subject2: $("#msub2").val(),
       teacher2: $("#mteach2").val(),
       audience2: $("#maud2").val(),
-      house2: $("#msel2").val(),
       period2: $('#btn-group2 button.active').val(),
     },
     beforeSend: function() {
@@ -158,12 +156,10 @@ function SendStreamSubjectData() { // Відправка Ajax на сервер 
       subject1: $("#ssub1").val(),
       teacher1: $("#steach1").val(),
       audience1: $("#saud1").val(),
-      house1: $("#ssel1").val(),
       period1: $('#stream-btn-group1 button.active').val(),
       subject2: $("#ssub2").val(),
       teacher2: $("#steach2").val(),
       audience2: $("#saud2").val(),
-      house2: $("#ssel2").val(),
       period2: $('#stream-btn-group2 button.active').val(),
     },
     beforeSend: function() {
@@ -278,7 +274,6 @@ function ClearSubModal() {
   $("#subject_add_modal .modal_container div div input").val('');
   $("#subject_add_modal .modal_container div .btn-group button").removeClass("active");
   $("#subject_add_modal .modal_container div .btn-group button:first-child").addClass("active");
-  $("#msel1, #ssel1, #msel2, #ssel2").val("1");
 };
 
 //Установка кнопки періоду
@@ -337,7 +332,6 @@ $(document).ready(function() {
                   $("#msub1").val(item.subject);
                   $("#mteach1").val(item.teacher);
                   $("#maud1").val(item.audience);
-                  $("#msel1").val(item.house);
                   SetPeriodActive(1, item.period);
                   DisableModalOdd();
                 } else if (item.pair_type == "парна") {
@@ -345,7 +339,6 @@ $(document).ready(function() {
                   $("#msub2").val(item.subject);
                   $("#mteach2").val(item.teacher);
                   $("#maud2").val(item.audience);
-                  $("#msel2").val(item.house);
                   SetPeriodActive(2, item.period);
                   EnableModalOdd();
                 } else if (item.pair_type == "непарна") {
@@ -353,7 +346,6 @@ $(document).ready(function() {
                   $("#msub1").val(item.subject);
                   $("#mteach1").val(item.teacher);
                   $("#maud1").val(item.audience);
-                  $("#msel1").val(item.house);
                   SetPeriodActive(1, item.period);
                   EnableModalOdd();
                 };

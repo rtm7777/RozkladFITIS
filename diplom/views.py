@@ -2,11 +2,10 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-import datetime
 from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule
 from django.utils import simplejson
 from django.contrib import auth
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
 
 days_in_week = [u'1Понеділок', u'2Вівторок', u'3Середа', u'4Четвер', u"5П'ятниця"]
@@ -50,14 +49,14 @@ def group_subjs(request):
 		if schedule.pair.pair_period.period == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
-			period = "2, 6, 10, 14"
+			period = "2,6,10,14"
 		elif schedule.pair.pair_period.period == 3:
-			period = "3, 7, 11, 15"
+			period = "3,7,11,15"
 		elif schedule.pair.pair_period.period ==4:
-			period = "4, 8, 12, 16"
+			period = "4,8,12,16"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
-		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing) + " " + period
-		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.'
+		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing)
+		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.' + " " + period
 		sub = {}
 		sub["daypair"] = schedule.day.day[0] + '_' + schedule.pair.pair_number
 		sub["subject"] =  subject + audience + teacher
@@ -89,11 +88,11 @@ def rozklad_content(request, group):
 		if schedule.pair.pair_period.period == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
-			period = "2, 6, 10, 14"
+			period = "2,6,10,14"
 		elif schedule.pair.pair_period.period == 3:
-			period = "3, 7, 11, 15"
+			period = "3,7,11,15"
 		elif schedule.pair.pair_period.period ==4:
-			period = "4, 8, 12, 16"
+			period = "4,8,12,16"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
 		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing) + ' ' + period
 		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.'
@@ -147,14 +146,14 @@ def rt_content(request, teacher):
 		if schedule.pair.pair_period.period == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
-			period = "2, 6, 10, 14"
+			period = "2,6,10,14"
 		elif schedule.pair.pair_period.period == 3:
-			period = "3, 7, 11, 15"
+			period = "3,7,11,15"
 		elif schedule.pair.pair_period.period ==4:
-			period = "4, 8, 12, 16"
+			period = "4,8,12,16"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
-		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing) + ' ' + period
-		group = ' ' + schedule.group.group_name
+		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing)
+		group = ' ' + schedule.group.group_name + ' ' + period
 
 		if schedule.pair.pair_type.type_of_pair == u'кожен':
 			result[schedule.day.day][schedule.pair.pair_number]['1'] = subject + audience + group
@@ -336,7 +335,7 @@ def pair_add(request):
 			pair_add.errors_message += " викладач1,"
 			pair_add.errors = "true"
 		try:
-			pair_add.s_audience = Audience.objects.get(number_of_audience = audience1)
+			pair_add.s_audience = Audience.objects.get(number_of_audience = audience1_split[0], housing__number_of_housing = audience1_split[1])
 		except:
 			pair_add.errors_message += " аудиторія1,"
 			pair_add.errors = "true"
@@ -353,7 +352,7 @@ def pair_add(request):
 			pair_add.errors_message += " викладач2,"
 			pair_add.errors = "true"
 		try:
-			pair_add.s_audience2 = Audience.objects.get(number_of_audience = audience2)
+			pair_add.s_audience2 = Audience.objects.get(number_of_audience = audience2_split[0], housing__number_of_housing = audience2_split[1])
 		except:
 			pair_add.errors_message += " аудиторія2,"
 			pair_add.errors = "true"
@@ -363,7 +362,7 @@ def pair_add(request):
 		subject1_split = subject1.split(" - ")
 	teacher1 = request.GET.get("teacher1").split(" ")
 	audience1 = request.GET.get("audience1")
-	house1 = request.GET.get("house1")
+	audience1_split = audience1.split(" - ")
 	period1 = request.GET.get("period1")
 
 	subject2 = request.GET.get("subject2")
@@ -371,7 +370,7 @@ def pair_add(request):
 		subject2_split = subject2.split(" - ")
 	teacher2 = request.GET.get("teacher2").split(" ")
 	audience2 = request.GET.get("audience2")
-	house2 = request.GET.get("house2")
+	audience2_split = audience2.split(" - ")
 	period2 = request.GET.get("period2")
 
 	s_day = Day.objects.get(day=day)
@@ -517,14 +516,14 @@ def getsubjsingle(request):
 		if schedule.pair.pair_period.period == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
-			period = "2, 6, 10, 14"
+			period = "2,6,10,14"
 		elif schedule.pair.pair_period.period == 3:
-			period = "3, 7, 11, 15"
+			period = "3,7,11,15"
 		elif schedule.pair.pair_period.period == 4:
-			period = "4, 8, 12, 16"
+			period = "4,8,12,16"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
-		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing) + ' ' + period
-		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.'
+		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing)
+		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.' + ' ' + period
 		sub = {}
 		sub["daypair"] = schedule.day.day[0] + '_' + schedule.pair.pair_number
 		sub["subject"] =  subject + audience + teacher
@@ -548,8 +547,7 @@ def getsubjsmodal(request):
 		sub = {}
 		sub["subject"] = schedule.subject.subject_name + " - " + schedule.subject.subject_type.type_of_subject
 		sub["teacher"] = schedule.teacher.teacher_last_name + " " + schedule.teacher.teacher_first_name + " " + schedule.teacher.teacher_middle_name
-		sub["audience"] = schedule.audience.number_of_audience
-		sub["house"] = schedule.audience.housing.number_of_housing
+		sub["audience"] = str(schedule.audience.number_of_audience) + " - " + str(schedule.audience.housing.number_of_housing)
 		sub["period"] = schedule.pair.pair_period.period
 		sub["pair_type"] = schedule.pair.pair_type.type_of_pair
 		sub["amount"] = "false"
@@ -558,6 +556,8 @@ def getsubjsmodal(request):
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
 
+@ensure_csrf_cookie
+@csrf_protect
 def experimental(request):
 	if not request.user.is_authenticated():
 		return render_to_response('login.html')
