@@ -11,9 +11,6 @@ from django.views.decorators.csrf import csrf_protect
 
 days_in_week = [u'1Понеділок', u'2Вівторок', u'3Середа', u'4Четвер', u"5П'ятниця"]
 pair_in_day = ['I', 'II', 'III', 'IV', 'V', 'VI']
-housings = []
-for house in Housing.objects.all():
-	housings.append(house.number_of_housing)
 
 def main(request):
 	return render_to_response('main.html')
@@ -185,7 +182,7 @@ def rozklad_admin(request):
 	groups_list = []
 	for g in groups:
 		groups_list.append(g.group_name)
-	return render_to_response('rozklad_admin.html', {'days': days, 'pairs': pairs, 'housings': housings, 'groups': groups_list})
+	return render_to_response('rozklad_admin.html', {'days': days, 'pairs': pairs, 'groups': groups_list})
 
 def about(request):
 	return render_to_response('about.html')
@@ -252,27 +249,25 @@ def audience_autocomplite(request):
 	audiences = Audience.objects.all()
 	
 	query = request.GET.get("auditory", "")
-	house = request.GET.get("korpus")
+
 	jquery = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
 		result = {}
 		res = []
 		for audience in audiences:
-			if audience.housing.number_of_housing == int(house):
-				aud = {}
-				aud['number'] = audience.number_of_audience
-				res.append(aud)
+			aud = {}
+			aud['number'] = audience.number_of_audience + " - " + str(audience.housing.number_of_housing)
+			res.append(aud)
 		result['sources'] = res
 		json = jquery+'('+simplejson.dumps(result)+')'
 	else:
 		result = {}
 		res = []
 		for audience in audiences:
-			if audience.housing.number_of_housing == int(house):
-				if str(audience.number_of_audience).lower().find(query.lower()) != -1:
-					aud = {}
-					aud['number'] = audience.number_of_audience
-					res.append(aud)
+			if str(audience.number_of_audience).lower().find(query.lower()) != -1:
+				aud = {}
+				aud['number'] = audience.number_of_audience + " - " + str(audience.housing.number_of_housing)
+				res.append(aud)
 		result['sources'] = res
 		json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')

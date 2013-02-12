@@ -27,132 +27,53 @@ $.ajaxSetup({    // Установка X-CSRFToken заголовку в Ajax з
 });
 
 $(function() {
-  $("#msub1, #msub2, #ssub1, #ssub2").autocomplete({
-    source: function(request,response) {
+  $("#msub1, #msub2, #ssub1, #ssub2").typeahead({
+    source: function(query, process) {
       $.ajax({
         url: "/ac",
         dataType: "jsonp",
-        data: {predmet: request.term},
+        data: {query: query},
         success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.name+' - '+item.type,
-              value: item.name+' - '+item.type
-            }
+          process($.map(data.sources, function(item) {
+            return item.name+' - '+item.type;
           }));
         }
       });
     },
-    minLength: 1,
   });
 });
 
 $(function() {
-  $("#mteach1, #mteach2, #steach1, #steach2").autocomplete({
-    source: function(request,response) {
+  $("#mteach1, #mteach2, #steach1, #steach2").typeahead({
+    source: function(query, process) {
       $.ajax({
         url: "/tch",
         dataType: "jsonp",
-        data: {teacher: request.term},
+        data: {query: query},
         success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.lastname+' '+item.firstname+' '+item.middlename,
-              value: item.lastname+' '+item.firstname+' '+item.middlename
-            }
+          process($.map(data.sources, function(item) {
+            return item.lastname+' '+item.firstname+' '+item.middlename;
           }));
         }
       });
     },
-    minLength: 1,
   });
 });
 
 $(function() {
-  $("#maud1").autocomplete({
-    source: function(request,response) {
+  $("#maud1, #saud1, #maud2, #saud2").typeahead({
+    source: function(query, process) {
       $.ajax({
         url: "/au",
         dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#msel1").val()},
+        data: {query: query},
         success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
+          process($.map(data.sources, function(item) {
+            return item.number;
           }));
         }
       });
     },
-    minLength: 1,
-  });
-});
-
-$(function() {
-  $("#saud1").autocomplete({
-    source: function(request,response) {
-      $.ajax({
-        url: "/au",
-        dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#ssel1").val()},
-        success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
-          }));
-        }
-      });
-    },
-    minLength: 1,
-  });
-});
-
-$(function() {
-  $("#maud2").autocomplete({
-    source: function(request,response) {
-      $.ajax({
-        url: "/au",
-        dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#msel2").val()},
-        success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
-          }));
-        }
-      });
-    },
-    minLength: 1,
-  });
-});
-
-$(function() {
-  $("#saud2").autocomplete({
-    source: function(request,response) {
-      $.ajax({
-        url: "/au",
-        dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#ssel2").val()},
-        success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
-          }));
-        }
-      });
-    },
-    minLength: 1,
   });
 });
 
