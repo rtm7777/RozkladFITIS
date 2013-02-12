@@ -298,7 +298,6 @@ function DisableModalOdd() {
   $("#msub2, #ssub2").prop({disabled: true});
   $("#mteach2, #steach2").prop({disabled: true});
   $("#maud2, #saud2").prop({disabled: true});
-  $("#msel2, #ssel2").prop({disabled: true});
   $(".modal_container .modal_cont2 div button").prop({disabled: true});
   $(".modal_container .modal_cont2 div label").addClass("label_disabled");
 }
@@ -307,7 +306,6 @@ function EnableModalOdd() {
   $("#msub2, #ssub2").prop({disabled: false});
   $("#mteach2, #steach2").prop({disabled: false});
   $("#maud2, #saud2").prop({disabled: false});
-  $("#msel2, #ssel2").prop({disabled: false});
   $(".modal_container .modal_cont2 div button").prop({disabled: false});
   $(".modal_container .modal_cont2 div label").removeClass("label_disabled");
 }
