@@ -418,6 +418,9 @@ def pair_stream_add(request):
 
 	schedules = Schedule.objects.all()
 
+	pair_add.errors = ""
+	pair_add.errors_message = "Некорректно введено:"
+
 	def save_schedule(day, group, teacher, audience, subject, pair):
 		p1 = Schedule(day = day,
 					group = group,
@@ -427,79 +430,106 @@ def pair_stream_add(request):
 					pair = pair)
 		p1.save()
 
+	def full_save_schedule():
+		pair_count = 0
+		for g in groups:
+			pair_count += Schedule.objects.filter(group__group_name = g, day__day = day, pair__pair_number = pair).count()
+		if not pair_count:
+			for g in groups:
+				s_group = Group.objects.get(group_name=g)
+				if evenodd == "true":
+					s_pair = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "кожен", pair_period__period=period1)
+					save_schedule(s_day, s_group, pair_add.s_teacher, pair_add.s_audience, pair_add.s_subject, s_pair)
+				elif evenodd == "false":
+					if subject1 and subject2:
+						s_pair1 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "непарна", pair_period__period= period1)
+						s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
+						save_schedule(s_day, s_group, pair_add.s_teacher, pair_add.s_audience, pair_add.s_subject, s_pair1)
+						save_schedule(s_day, s_group, pair_add.s_teacher2, pair_add.s_audience2, pair_add.s_subject2, s_pair2)
+					elif not subject2 and subject1:
+						s_pair1 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "непарна", pair_period__period = period1)
+						save_schedule(s_day, s_group, pair_add.s_teacher, pair_add.s_audience, pair_add.s_subject, s_pair1)
+					elif not subject1 and subject2:
+						s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
+						save_schedule(s_day, s_group, pair_add.s_teacher2, pair_add.s_audience2, pair_add.s_subject2, s_pair2)
+
+	def error_check1():
+		try:
+			pair_add.s_subject = Subject.objects.get(subject_name = subject1_split[0], subject_type__type_of_subject = subject1_split[1])
+		except:
+			pair_add.errors_message += " предмет1,"
+			pair_add.errors = "true"
+		try:
+			pair_add.s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
+		except:
+			pair_add.errors_message += " викладач1,"
+			pair_add.errors = "true"
+		try:
+			pair_add.s_audience = Audience.objects.get(number_of_audience = audience1_split[0], housing__number_of_housing = audience1_split[1])
+		except:
+			pair_add.errors_message += " аудиторія1,"
+			pair_add.errors = "true"
+
+	def error_check2():
+		try:
+			pair_add.s_subject2 = Subject.objects.get(subject_name = subject2_split[0], subject_type__type_of_subject = subject2_split[1])
+		except:
+			pair_add.errors_message += " предмет2,"
+			pair_add.errors = "true"
+		try:
+			pair_add.s_teacher2 = Teacher.objects.get(teacher_last_name = teacher2[0], teacher_first_name = teacher2[1], teacher_middle_name = teacher2[2])
+		except:
+			pair_add.errors_message += " викладач2,"
+			pair_add.errors = "true"
+		try:
+			pair_add.s_audience2 = Audience.objects.get(number_of_audience = audience2_split[0], housing__number_of_housing = audience2_split[1])
+		except:
+			pair_add.errors_message += " аудиторія2,"
+			pair_add.errors = "true"
+
+	subject1 = request.GET.get("subject1")
+	if subject1:
+		subject1_split = subject1.split(" - ")
+	teacher1 = request.GET.get("teacher1").split(" ")
+	audience1 = request.GET.get("audience1")
+	audience1_split = audience1.split(" - ")
+	period1 = request.GET.get("period1")
+
+	subject2 = request.GET.get("subject2")
+	if subject2:
+		subject2_split = subject2.split(" - ")
+	teacher2 = request.GET.get("teacher2").split(" ")
+	audience2 = request.GET.get("audience2")
+	audience2_split = audience2.split(" - ")
+	period2 = request.GET.get("period2")
+
 	s_day = Day.objects.get(day=day)
 
-	pair_count = 0
-	for g in groups:
-		pair_count += Schedule.objects.filter(group__group_name = g, day__day = day, pair__pair_number = pair).count()
+	if evenodd == "true":
+		if subject1 != "":
+			error_check1()
+			if pair_add.errors != "true":
+				full_save_schedule()
 
-	if not pair_count:
-		for g in groups:
-			s_group = Group.objects.get(group_name=g)
-			if evenodd == "true":
-				subject1 = request.GET.get("subject1")
-				subject1 = subject1.split(" - ")
-				teacher1 = request.GET.get("teacher1").split(" ")
-				audience1 = request.GET.get("audience1")
-				house1 = request.GET.get("house1")
-				period1 = request.GET.get("period1")
-
-				s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
-				s_audience = Audience.objects.get(number_of_audience = audience1)
-				s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
-				s_pair = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "кожен", pair_period__period=period1)
-
-				save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair)
-
-			elif evenodd == "false":
-				subject1 = request.GET.get("subject1")
-				subject2 = request.GET.get("subject2")
-				subject1 = subject1.split(" - ")
-				teacher1 = request.GET.get("teacher1").split(" ")
-				audience1 = request.GET.get("audience1")
-				house1 = request.GET.get("house1")
-				period1 = request.GET.get("period1")
-				subject2 = subject2.split(" - ")
-				teacher2 = request.GET.get("teacher2").split(" ")
-				audience2 = request.GET.get("audience2")
-				house2 = request.GET.get("house2")
-				period2 = request.GET.get("period2")
-				
-				if subject1 and subject2:
-					s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
-					s_audience = Audience.objects.get(number_of_audience = audience1)
-					s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
-					s_pair1 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "непарна", pair_period__period= period1)
-					s_teacher2 = Teacher.objects.get(teacher_last_name = teacher2[0], teacher_first_name = teacher2[1], teacher_middle_name = teacher2[2])
-					s_audience2 = Audience.objects.get(number_of_audience = audience2)
-					s_subject2 = Subject.objects.get(subject_name = subject2[0], subject_type__type_of_subject = subject2[1])
-					s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
-
-					save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair1)
-					save_schedule(s_day, s_group, s_teacher2, s_audience2, s_subject2, s_pair2)
-
-				elif not subject2 and subject1:
-					s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
-					s_audience = Audience.objects.get(number_of_audience = audience1)
-					s_subject = Subject.objects.get(subject_name = subject1[0], subject_type__type_of_subject = subject1[1])
-					s_pair1 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "непарна", pair_period__period = period1)
-
-					save_schedule(s_day, s_group, s_teacher, s_audience, s_subject, s_pair1)
-
-				elif not subject1 and subject2:
-					s_teacher2 = Teacher.objects.get(teacher_last_name = teacher2[0], teacher_first_name = teacher2[1], teacher_middle_name = teacher2[2])
-					s_audience2 = Audience.objects.get(number_of_audience = audience2)
-					s_subject2 = Subject.objects.get(subject_name = subject2[0], subject_type__type_of_subject = subject2[1])
-					s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
-
-					save_schedule(s_day, s_group, s_teacher2, s_audience2, s_subject2, s_pair2)
-		result = {}
-		result['sour'] = evenodd
-		json = jquery+'('+simplejson.dumps(result)+')'
-	else:
-		result = {}
-		result['sour'] = evenodd
-		json = jquery+'('+simplejson.dumps(result)+')'
+	elif evenodd == "false":
+		if subject1 != "" and subject2 != "":
+			error_check1()
+			error_check2()
+			if pair_add.errors != "true":
+				full_save_schedule()
+		elif subject2 == "":
+			error_check1()
+			if pair_add.errors != "true":
+				full_save_schedule()
+		elif subject1 == "":
+			error_check2()
+			if pair_add.errors != "true":
+				full_save_schedule()
+	
+	result = {}
+	result['errors'] = pair_add.errors
+	result['errors_message'] = pair_add.errors_message[:-1]
+	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
 
 def getsubjsingle(request):

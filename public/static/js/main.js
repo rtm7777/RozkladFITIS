@@ -165,9 +165,15 @@ function SendStreamSubjectData() { // Відправка Ajax на сервер 
     beforeSend: function() {
       $("#load_animation").show("fast");
     },
-    success: function() {
-      $("#add_stream_modal").modal('hide');
-      $("#load_animation").hide("fast");
+    success: function(data) {
+      if (data.errors !== "true") {
+        $("#add_stream_modal").modal('hide');
+        $("#load_animation").hide("fast");
+        ShowMessage("success", "dodano");
+      } else {
+        $("#load_animation").hide("fast");
+        ShowModalMessage("#add_stream_modal", data.errors_message);
+      };
     },
     error: function() {
       ShowMessage("error", "Виникла помилка при додаванні занять");
@@ -182,55 +188,58 @@ $(function() {
     if ($("#daycheck").prop("checked")) {
       if ($("#msub1").val() !== "") {
         if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");
           errors = true;
         };
       }; 
     } else {
       if ($("#msub1").val() !== "") {
         if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");e
           errors = true;
         };
       };
       if ($("#msub2").val() !== "") {
         if ($("#mteach2").val() == "" || $("#maud2").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");;
           errors = true;
         };
       };
     };
     if (errors !== true) {
       SendSubjectData();
+    } else {
+      ShowModalMessage("#subject_add_modal", "Заповніть всі поля");
     };
   });
 });
 
 $(function() {
   $("#send_stream_subject").click(function() { // Провірка вікна дод. поток. заняття на заповненість
-    errors1 = false;
-    errors2 = false;
+    errors = false;
     if ($("#stream_groups").val() == "" || $("#stream_pair").val() == "" || $("#stream_day").val() == "") {
-      errors1 = true;
+      errors = true;
     };
     if ($("#streamdaycheck").prop("checked")) {
-      if ($("#ssub1").val() == "" || $("#steach1").val() == "" || $("#saud1").val() == "") {
-        errors1 = true;
-      };
+      if ($("#ssub1").val() !== "") {
+        if ($("#steach1").val() == "" || $("#saud1").val() == "") {
+          errors = true;
+        };
+      }; 
     } else {
-      if ($("#ssub1").val() == "" || $("#steach1").val() == "" || $("#saud1").val() == "") {
-        errors1 = true;
+      if ($("#ssub1").val() !== "") {
+        if ($("#steach1").val() == "" || $("#saud1").val() == "") {
+          errors = true;
+        };
       };
-      if ($("#ssub2").val() == "" || $("#steach2").val() == "" || $("#saud2").val() == "") {
-        errors2 = true;
+      if ($("#ssub2").val() !== "") {
+        if ($("#steach2").val() == "" || $("#saud2").val() == "") {
+          errors = true;
+        };
       };
     };
-    if (errors1 !== true && errors2 !== true) {
+    if (errors !== true) {
       SendStreamSubjectData();
     } else {
       ShowModalMessage("#add_stream_modal", "Заповніть всі поля");
     };
-    
   });
 });
 
