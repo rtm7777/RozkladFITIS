@@ -30,7 +30,13 @@
 	</form>
 
 <p style="margin: 0.4em;">
-    <a href="{% url socialauth_begin 'facebook' %}?next=/forum/">Enter Facebook</a>
+    <a href="{% url socialauth_begin 'facebook' %}?next=/forum/">Увійти через Facebook</a>
+</p>
+<p style="margin: 0.4em;">
+    <a href="{% url socialauth_begin 'twitter' %}?next=/forum">Увійти через Twitter</a>
+</p>
+<p style="margin: 0.4em;">
+    <a href="{% url socialauth_begin 'google-oauth2' %}?next=/forum">Увійти через Google</a>
 </p>
 
 </div>

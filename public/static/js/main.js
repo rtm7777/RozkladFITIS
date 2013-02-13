@@ -27,132 +27,53 @@ $.ajaxSetup({    // Установка X-CSRFToken заголовку в Ajax з
 });
 
 $(function() {
-  $("#msub1, #msub2, #ssub1, #ssub2").autocomplete({
-    source: function(request,response) {
+  $("#msub1, #msub2, #ssub1, #ssub2").typeahead({
+    source: function(query, process) {
       $.ajax({
         url: "/ac",
         dataType: "jsonp",
-        data: {predmet: request.term},
+        data: {query: query},
         success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.name+' - '+item.type,
-              value: item.name+' - '+item.type
-            }
+          process($.map(data.sources, function(item) {
+            return item.name+' - '+item.type;
           }));
         }
       });
     },
-    minLength: 1,
   });
 });
 
 $(function() {
-  $("#mteach1, #mteach2, #steach1, #steach2").autocomplete({
-    source: function(request,response) {
+  $("#mteach1, #mteach2, #steach1, #steach2").typeahead({
+    source: function(query, process) {
       $.ajax({
         url: "/tch",
         dataType: "jsonp",
-        data: {teacher: request.term},
+        data: {query: query},
         success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.lastname+' '+item.firstname+' '+item.middlename,
-              value: item.lastname+' '+item.firstname+' '+item.middlename
-            }
+          process($.map(data.sources, function(item) {
+            return item.lastname+' '+item.firstname+' '+item.middlename;
           }));
         }
       });
     },
-    minLength: 1,
   });
 });
 
 $(function() {
-  $("#maud1").autocomplete({
-    source: function(request,response) {
+  $("#maud1, #saud1, #maud2, #saud2").typeahead({
+    source: function(query, process) {
       $.ajax({
         url: "/au",
         dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#msel1").val()},
+        data: {query: query},
         success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
+          process($.map(data.sources, function(item) {
+            return item.number;
           }));
         }
       });
     },
-    minLength: 1,
-  });
-});
-
-$(function() {
-  $("#saud1").autocomplete({
-    source: function(request,response) {
-      $.ajax({
-        url: "/au",
-        dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#ssel1").val()},
-        success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
-          }));
-        }
-      });
-    },
-    minLength: 1,
-  });
-});
-
-$(function() {
-  $("#maud2").autocomplete({
-    source: function(request,response) {
-      $.ajax({
-        url: "/au",
-        dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#msel2").val()},
-        success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
-          }));
-        }
-      });
-    },
-    minLength: 1,
-  });
-});
-
-$(function() {
-  $("#saud2").autocomplete({
-    source: function(request,response) {
-      $.ajax({
-        url: "/au",
-        dataType: "jsonp",
-        data: {auditory: request.term,
-              korpus: $("#ssel2").val()},
-        success: function(data) {
-          response($.map(data.sources, function(item) {
-            return {
-              label: item.number,
-              value: item.number
-            }
-          }));
-        }
-      });
-    },
-    minLength: 1,
   });
 });
 
@@ -167,12 +88,10 @@ function SendSubjectData() {  // Відправка Ajax на сервер дл�
       subject1: $("#msub1").val(),
       teacher1: $("#mteach1").val(),
       audience1: $("#maud1").val(),
-      house1: $("#msel1").val(),
       period1: $('#btn-group1 button.active').val(),
       subject2: $("#msub2").val(),
       teacher2: $("#mteach2").val(),
       audience2: $("#maud2").val(),
-      house2: $("#msel2").val(),
       period2: $('#btn-group2 button.active').val(),
     },
     beforeSend: function() {
@@ -237,20 +156,24 @@ function SendStreamSubjectData() { // Відправка Ajax на сервер 
       subject1: $("#ssub1").val(),
       teacher1: $("#steach1").val(),
       audience1: $("#saud1").val(),
-      house1: $("#ssel1").val(),
       period1: $('#stream-btn-group1 button.active').val(),
       subject2: $("#ssub2").val(),
       teacher2: $("#steach2").val(),
       audience2: $("#saud2").val(),
-      house2: $("#ssel2").val(),
       period2: $('#stream-btn-group2 button.active').val(),
     },
     beforeSend: function() {
       $("#load_animation").show("fast");
     },
-    success: function() {
-      $("#add_stream_modal").modal('hide');
-      $("#load_animation").hide("fast");
+    success: function(data) {
+      if (data.errors !== "true") {
+        $("#add_stream_modal").modal('hide');
+        $("#load_animation").hide("fast");
+        ShowMessage("success", "dodano");
+      } else {
+        $("#load_animation").hide("fast");
+        ShowModalMessage("#add_stream_modal", data.errors_message);
+      };
     },
     error: function() {
       ShowMessage("error", "Виникла помилка при додаванні занять");
@@ -265,55 +188,58 @@ $(function() {
     if ($("#daycheck").prop("checked")) {
       if ($("#msub1").val() !== "") {
         if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");
           errors = true;
         };
       }; 
     } else {
       if ($("#msub1").val() !== "") {
         if ($("#mteach1").val() == "" || $("#maud1").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");e
           errors = true;
         };
       };
       if ($("#msub2").val() !== "") {
         if ($("#mteach2").val() == "" || $("#maud2").val() == "") {
-          ShowModalMessage("#subject_add_modal", "Заповніть всі поля");;
           errors = true;
         };
       };
     };
     if (errors !== true) {
       SendSubjectData();
+    } else {
+      ShowModalMessage("#subject_add_modal", "Заповніть всі поля");
     };
   });
 });
 
 $(function() {
   $("#send_stream_subject").click(function() { // Провірка вікна дод. поток. заняття на заповненість
-    errors1 = false;
-    errors2 = false;
+    errors = false;
     if ($("#stream_groups").val() == "" || $("#stream_pair").val() == "" || $("#stream_day").val() == "") {
-      errors1 = true;
+      errors = true;
     };
     if ($("#streamdaycheck").prop("checked")) {
-      if ($("#ssub1").val() == "" || $("#steach1").val() == "" || $("#saud1").val() == "") {
-        errors1 = true;
-      };
+      if ($("#ssub1").val() !== "") {
+        if ($("#steach1").val() == "" || $("#saud1").val() == "") {
+          errors = true;
+        };
+      }; 
     } else {
-      if ($("#ssub1").val() == "" || $("#steach1").val() == "" || $("#saud1").val() == "") {
-        errors1 = true;
+      if ($("#ssub1").val() !== "") {
+        if ($("#steach1").val() == "" || $("#saud1").val() == "") {
+          errors = true;
+        };
       };
-      if ($("#ssub2").val() == "" || $("#steach2").val() == "" || $("#saud2").val() == "") {
-        errors2 = true;
+      if ($("#ssub2").val() !== "") {
+        if ($("#steach2").val() == "" || $("#saud2").val() == "") {
+          errors = true;
+        };
       };
     };
-    if (errors1 !== true && errors2 !== true) {
+    if (errors !== true) {
       SendStreamSubjectData();
     } else {
       ShowModalMessage("#add_stream_modal", "Заповніть всі поля");
     };
-    
   });
 });
 
@@ -357,7 +283,6 @@ function ClearSubModal() {
   $("#subject_add_modal .modal_container div div input").val('');
   $("#subject_add_modal .modal_container div .btn-group button").removeClass("active");
   $("#subject_add_modal .modal_container div .btn-group button:first-child").addClass("active");
-  $("#msel1, #ssel1, #msel2, #ssel2").val("1");
 };
 
 //Установка кнопки періоду
@@ -377,7 +302,6 @@ function DisableModalOdd() {
   $("#msub2, #ssub2").prop({disabled: true});
   $("#mteach2, #steach2").prop({disabled: true});
   $("#maud2, #saud2").prop({disabled: true});
-  $("#msel2, #ssel2").prop({disabled: true});
   $(".modal_container .modal_cont2 div button").prop({disabled: true});
   $(".modal_container .modal_cont2 div label").addClass("label_disabled");
 }
@@ -386,7 +310,6 @@ function EnableModalOdd() {
   $("#msub2, #ssub2").prop({disabled: false});
   $("#mteach2, #steach2").prop({disabled: false});
   $("#maud2, #saud2").prop({disabled: false});
-  $("#msel2, #ssel2").prop({disabled: false});
   $(".modal_container .modal_cont2 div button").prop({disabled: false});
   $(".modal_container .modal_cont2 div label").removeClass("label_disabled");
 }
@@ -418,7 +341,6 @@ $(document).ready(function() {
                   $("#msub1").val(item.subject);
                   $("#mteach1").val(item.teacher);
                   $("#maud1").val(item.audience);
-                  $("#msel1").val(item.house);
                   SetPeriodActive(1, item.period);
                   DisableModalOdd();
                 } else if (item.pair_type == "парна") {
@@ -426,7 +348,6 @@ $(document).ready(function() {
                   $("#msub2").val(item.subject);
                   $("#mteach2").val(item.teacher);
                   $("#maud2").val(item.audience);
-                  $("#msel2").val(item.house);
                   SetPeriodActive(2, item.period);
                   EnableModalOdd();
                 } else if (item.pair_type == "непарна") {
@@ -434,7 +355,6 @@ $(document).ready(function() {
                   $("#msub1").val(item.subject);
                   $("#mteach1").val(item.teacher);
                   $("#maud1").val(item.audience);
-                  $("#msel1").val(item.house);
                   SetPeriodActive(1, item.period);
                   EnableModalOdd();
                 };

@@ -43,7 +43,7 @@
 }
 
 .modal-body {
-	overflow: hidden;
+	overflow: visible;
 }
 
 /*Оформлення контейнера для модального вікна set_predmet*/
@@ -63,9 +63,8 @@
 }
 
 /*Стиль для кнопок очистки полів set_predmet*/
-.ui-widget button {
-	margin-bottom: 11px;
-	padding: 4px 3px;
+.modal_container div .input-append input {
+	width: 195px;
 }
 
 /*Модальне вікно додавання заняття*/
@@ -75,7 +74,11 @@
 
 /*Модальне вікно додавання потокового заняття*/
 .btn-group-vertical > .btn {
-	max-width: 95%;
+	max-width: 90%;
+}
+
+.modal_container div .btn-group {
+	margin-top: 10px;
 }
 
 #groups-popover {

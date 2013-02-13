@@ -1,6 +1,12 @@
     RozkladFITIS
     Django web application is developed as a thesis project.
+<<<<<<< HEAD
 
+
+
+=======
+    
+>>>>>>> typeahead
     Project Title - "The information system of dispatching service of the university."
     
     The project aims to help managers automate the scheduling of classes.
