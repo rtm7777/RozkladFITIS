@@ -452,6 +452,16 @@ def pair_stream_add(request):
 					elif not subject1 and subject2:
 						s_pair2 = Pair.objects.get(pair_number = pair, pair_type__type_of_pair = "парна", pair_period__period =  period2)
 						save_schedule(s_day, s_group, pair_add.s_teacher2, pair_add.s_audience2, pair_add.s_subject2, s_pair2)
+		else:
+			pair_add.errors = "true"
+			pair_add.errors_message = "Заняття уже є у групах:"
+			busy_groups_set = set()
+			busy_groups = Schedule.objects.filter(day__day = day, pair__pair_number = pair)
+			for g in busy_groups:
+				if g.group.group_name in groups:
+					busy_groups_set.add(g.group.group_name)
+			for g in busy_groups_set:
+				pair_add.errors_message += " " + g.encode("utf-8") + ","
 
 	def error_check1():
 		try:

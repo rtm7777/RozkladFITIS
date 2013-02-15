@@ -26,7 +26,7 @@ $.ajaxSetup({    // Установка X-CSRFToken заголовку в Ajax з
     }
 });
 
-$(function() {
+$(function() {  // Ajax для автозаповнення предмету
   $("#msub1, #msub2, #ssub1, #ssub2").typeahead({
     source: function(query, process) {
       $.ajax({
@@ -43,7 +43,7 @@ $(function() {
   });
 });
 
-$(function() {
+$(function() {  // Ajax для автозаповнення викладача
   $("#mteach1, #mteach2, #steach1, #steach2").typeahead({
     source: function(query, process) {
       $.ajax({
@@ -60,7 +60,7 @@ $(function() {
   });
 });
 
-$(function() {
+$(function() {  // Ajax для автозаповнення аудиторії
   $("#maud1, #saud1, #maud2, #saud2").typeahead({
     source: function(query, process) {
       $.ajax({
@@ -99,7 +99,7 @@ function SendSubjectData() {  // Відправка Ajax на сервер дл�
     },
     success: function(data) {
       if (data.errors !== "true") {
-        $.ajax({
+        $.ajax({  // Ajax для відображення доданого предмету в таблиці
           url: "/getsubjsingle",
           dataType: "jsonp",
           data: {
@@ -167,6 +167,9 @@ function SendStreamSubjectData() { // Відправка Ajax на сервер 
     },
     success: function(data) {
       if (data.errors !== "true") {
+        if ($("#group").val() !== "") {
+          GetSubjects($("#group").val(), false)
+        };
         $("#add_stream_modal").modal('hide');
         $("#load_animation").hide("fast");
         ShowMessage("success", "dodano");
@@ -181,6 +184,39 @@ function SendStreamSubjectData() { // Відправка Ajax на сервер 
     }
   });
 };
+
+function GetSubjects(group_val, message) {  // Отримання JSON занять для певної і їх відображення
+    $.ajax({
+      url: "/getsubjs",
+      dataType: "jsonp",
+      data: {
+        group: group_val,
+      },
+      beforeSend: function() {
+        $("#load_animation").show("fast");
+      },
+      success: function(data) {
+        $("tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
+        $.map(data.sources, function(item) {
+          if (item.tupe == "кожен") {
+            $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
+          } else if (item.tupe == "непарна") {
+            $('#'+item.daypair+' .subject_content p:first-child').removeClass("null").text(item.subject);
+          } else if (item.tupe == "парна") {
+            $('#'+item.daypair+' .subject_content p:last-child').removeClass("null").text(item.subject);
+          };
+        });
+        if (message == true) {
+          ShowMessage("info", "Вибрано групу " + group_val);
+        };
+        $("#load_animation").hide("fast");
+      },
+      error: function() {
+        ShowMessage("error", "Виникла помилка");
+        $("#load_animation").hide("fast");
+      }
+    });
+}
 
 $(function() {
   $("#sendsubject").click(function() { // Провірка вікна дод. заняття на заповненість
@@ -257,7 +293,6 @@ $(function() { // Функція для входу користувача (Ajax)
   });
 });
 
-
 $(function() { //Очистка полів введення у вікні додавання заняття
   $(".modal_container div div button").click(function() {
     var button = $(this).val();
@@ -271,23 +306,19 @@ function ShowMessage(type, message) { // Показ повідомлень
   $("#alert_"+type).slideUp();
 };
 
-//Повыдомлення в модальному вікні
-function ShowModalMessage(modal, message) {
+function ShowModalMessage(modal, message) {  //Повідомлення в модальному вікні
   $(modal+" .modal-footer .modal_message p b").text(message);
   $(modal+" .modal-footer .modal_message").show("fast").delay(1700);
   $(modal+" .modal-footer .modal_message").hide("fast");
 };
 
-//Очистка модального вікна
-function ClearSubModal() { 
+function ClearSubModal() {  //Очистка модального вікна
   $("#subject_add_modal .modal_container div div input").val('');
   $("#subject_add_modal .modal_container div .btn-group button").removeClass("active");
   $("#subject_add_modal .modal_container div .btn-group button:first-child").addClass("active");
 };
 
-//Установка кнопки періоду
-//Потрібно переписать для підтримки IE8
-function SetPeriodActive(evenodd, period) {
+function SetPeriodActive(evenodd, period) { //Установка кнопки періоду
   if (evenodd == 1) {
     $(".modal_cont1 .btn-group button").removeClass("active");
     $(".modal_cont1 .btn-group button:nth-child("+period+")").addClass("active");
@@ -295,10 +326,9 @@ function SetPeriodActive(evenodd, period) {
     $(".modal_cont2 .btn-group button").removeClass("active");
     $(".modal_cont2 .btn-group button:nth-child("+period+")").addClass("active");
   };
-  
 }
 
-function DisableModalOdd() {
+function DisableModalOdd() {  //Блокування правої частини діалогового вікна
   $("#msub2, #ssub2").prop({disabled: true});
   $("#mteach2, #steach2").prop({disabled: true});
   $("#maud2, #saud2").prop({disabled: true});
@@ -306,7 +336,7 @@ function DisableModalOdd() {
   $(".modal_container .modal_cont2 div label").addClass("label_disabled");
 }
 
-function EnableModalOdd() {
+function EnableModalOdd() {  //Розблокування правої частини діалогового вікна
   $("#msub2, #ssub2").prop({disabled: false});
   $("#mteach2, #steach2").prop({disabled: false});
   $("#maud2, #saud2").prop({disabled: false});
@@ -379,8 +409,6 @@ $(document).ready(function() {
       ShowMessage("error", "Спочатку виберіть групу");
     };
   });
-
-  $("#toTop").hide();
  
   $(function () {  //функція для прокрутки сторінки вгору
       $(window).scroll(function () {
@@ -403,37 +431,10 @@ $(document).ready(function() {
     var group = $(this);
     $("#group").prop({value: group.attr("value")});
     $("#group_name").text("Група - " + group.attr("value"));
-    $.ajax({
-      url: "/getsubjs",
-      dataType: "jsonp",
-      data: {
-        group: group.attr("value"),
-      },
-      beforeSend: function() {
-        $("#load_animation").show("fast");
-      },
-      success: function(data) {
-        $("tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
-        $.map(data.sources, function(item) {
-          if (item.tupe == "кожен") {
-            $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
-          } else if (item.tupe == "непарна") {
-            $('#'+item.daypair+' .subject_content p:first-child').removeClass("null").text(item.subject);
-          } else if (item.tupe == "парна") {
-            $('#'+item.daypair+' .subject_content p:last-child').removeClass("null").text(item.subject);
-          };
-        });
-        ShowMessage("info", "Вибрано групу " + group.attr("value"));
-        $("#load_animation").hide("fast");
-      },
-      error: function() {
-        ShowMessage("error", "Виникла помилка");
-        $("#load_animation").hide("fast");
-      }
-    });
+    GetSubjects(group.attr("value"), true)
   });
 
-  $("#daycheck").click(function() {
+  $("#daycheck").click(function() {  // Зміна стану діалогового вікна заняття
     if ($("#daycheck").is(':checked')) {
       DisableModalOdd();
     } else {
@@ -441,7 +442,7 @@ $(document).ready(function() {
     };
   });
 
-  $("#streamdaycheck").click(function() {
+  $("#streamdaycheck").click(function() {  // Зміна стану діалогового вікна потокового заняття
     if ($("#streamdaycheck").is(':checked')) {
       DisableModalOdd();
     } else {

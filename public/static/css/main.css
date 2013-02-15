@@ -91,6 +91,10 @@ tr:hover:nth-child(6n-5) td:first-child {
 	cursor: default;
 }
 
+td:nth-last-child(2) {
+	cursor: move;
+}
+
 tbody tr {
 	cursor: text;
 }

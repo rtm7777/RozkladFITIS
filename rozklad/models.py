@@ -8,7 +8,7 @@ class Group(models.Model):
 	year = models.IntegerField(verbose_name=u"курс")
 
 	def __unicode__(self):
-		return self.group_name
+		return u'%s' % self.group_name
 
 	class Meta:
 		verbose_name = u'Групу'
@@ -53,7 +53,7 @@ class Audience(models.Model):
 	audience_type = models.ForeignKey(AudienceType, verbose_name=u'тип аудиторії')
 
 	def __unicode__(self):
-		return u'%s ' % self.number_of_audience
+		return u'%s' % self.number_of_audience
 
 	class Meta:
 		verbose_name = u'Аудиторію'
