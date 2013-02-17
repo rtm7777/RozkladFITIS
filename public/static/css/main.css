@@ -91,10 +91,6 @@ tr:hover:nth-child(6n-5) td:first-child {
 	cursor: default;
 }
 
-td:nth-last-child(2) {
-	cursor: move;
-}
-
 tbody tr {
 	cursor: text;
 }
@@ -117,7 +113,10 @@ tbody tr {
 
 .single_content {
 	padding: 15px 5px !important;
+}
 
+.single_sub {
+	padding: 13px 0;
 }
 
 .day_para {
@@ -176,7 +175,7 @@ tbody tr {
 	display: none;
 }
 
-.alert {
+body > .alert {
 	display: none;
 	position: fixed;
 	bottom: 5px;
@@ -270,3 +269,38 @@ tbody tr {
 	0% { -webkit-transform:rotate(0deg); }
 	100% { -webkit-transform:rotate(360deg); }
 }
+
+
+/*Drag And Drop*/
+
+.pop_elem {
+	position: relative;
+	overflow: hidden;
+	margin-top: -50px;
+	display: none;
+	height: 50px;
+	background-color: rgba(245, 245, 245, 0.5);
+	border-radius: 5px;
+}
+
+.pop_elem > div {
+	margin: 6px 20px;
+}
+
+.pop_elem div div {
+	margin: 0 10px;
+	display: inline-block;
+}
+
+.drag_start {
+	opacity: 0.4 !important;
+}
+
+.drag_enter {
+	background-color: rgba(0, 126, 255, 0.4);
+}
+
+.dnd_live {
+	display: none;
+}
+

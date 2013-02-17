@@ -110,16 +110,17 @@ function SendSubjectData() {  // Відправка Ajax на сервер дл�
             $("#load_animation").show("fast");
           },
           success: function(data) {
+            var dnd_html = $(".dnd_live").html();
             var id_day = $("#day").val().charAt(0);
             var id_pair = $("#day").val().split(' ');
-            $("#"+id_day+"_"+id_pair[1]+" td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
+            $("#"+id_day+"_"+id_pair[1]+" td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>'+dnd_html);
             $.map(data.sources, function(item) {
               if (item.tupe == "кожен") {
-                $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
+                $('#'+item.daypair+' .subject_content').html('<p class="single_sub">'+item.subject+'</p>'+dnd_html);
               } else if (item.tupe == "непарна") {
-                $('#'+item.daypair+' td p:first-child').removeClass("null").text(item.subject);
+                $('#'+item.daypair+' td p:first').removeClass("null").text(item.subject);
               } else if (item.tupe == "парна") {
-                $('#'+item.daypair+' td p:last-child').removeClass("null").text(item.subject);
+                $('#'+item.daypair+' td p:last').removeClass("null").text(item.subject);
               };
             });
             $("#load_animation").hide("fast");
@@ -196,14 +197,15 @@ function GetSubjects(group_val, message) {  // Отримання JSON заня�
         $("#load_animation").show("fast");
       },
       success: function(data) {
-        $("tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>');
+        var dnd_html = $(".dnd_live").html();
+        $("tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>'+dnd_html);
         $.map(data.sources, function(item) {
           if (item.tupe == "кожен") {
-            $('#'+item.daypair+' .subject_content').addClass("single_admin").text(item.subject);
+            $('#'+item.daypair+' .subject_content').html('<p class="single_sub">'+item.subject+'</p>'+dnd_html);
           } else if (item.tupe == "непарна") {
-            $('#'+item.daypair+' .subject_content p:first-child').removeClass("null").text(item.subject);
+            $('#'+item.daypair+' .subject_content p:first').removeClass("null").text(item.subject);
           } else if (item.tupe == "парна") {
-            $('#'+item.daypair+' .subject_content p:last-child').removeClass("null").text(item.subject);
+            $('#'+item.daypair+' .subject_content p:last').removeClass("null").text(item.subject);
           };
         });
         if (message == true) {
@@ -502,5 +504,57 @@ $(document).ready(function() {
     $("#stream_groups").val(data);
     $('#groups-popover').popover('hide');
   });
+
+
+
+
+
+
+
+
+
+  // HTML5 Drag And Drop
+
+  $(".subject_content").on("dragstart", function(e) {
+    e.originalEvent.dataTransfer.setData("Text", "dsf");
+    $(this).addClass("drag_start");
+    $("td:last-child div").fadeIn();
+  });
+
+  $(document).on('dragover', ".subject_content > div > div > div", function(e) {
+    e.preventDefault(); // Necessary. Allows us to drop.
+    return false;
+  });
+
+  $(document).on('dragenter', ".subject_content > div > div > div", function(e) {
+    $(this).addClass("drag_enter");
+    return false;
+  });
+ 
+  $(document).on('dragleave', ".subject_content > div > div > div", function(e) {
+    $(this).removeClass("drag_enter");
+    return false;
+  });
+
+  $(document).on('drop', ".subject_content div div div", function(e) {
+    var tbt = e.originalEvent.dataTransfer.getData("Text");
+    e.preventDefault();
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    };
+    alert(tbt);
+    $(this).removeClass("drag_enter");
+    return false;
+  });
+
+  $("tr td:last-child").on('dragend', function (e) {
+    $("td:last-child div").fadeOut();
+    $("td:last-child").removeClass("drag_enter");
+    $(this).removeClass("drag_start");
+    
+
+  });
+
 });
+
 

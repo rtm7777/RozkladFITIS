@@ -86,12 +86,25 @@
 												{%if pair == 'I'%}
 												<td rowspan="6"><div class="box_rotate">{{day|slice:"1:"}}</div></td>
 												{%endif%}
-												<td draggable="true">{{pair}}</td>
-												<td class="subject_content">
+												<td>{{pair}}</td>
+												<td draggable="true" class="subject_content">
 													<p class="null"></p>
 													<hr>
 													<p class="null"></p>
+													
 												</td>
+												<div class="dnd_live">
+													<div class="pop_elem">
+														<div>
+															<div class="alert alert-info">
+																Поміняти місцями
+															</div>
+															<div class="alert alert-info">
+																Замінити
+															</div>
+														</div>
+													</div>
+												</div>
 											</tr>
 											{%endfor%}
 										{%endfor%}	
