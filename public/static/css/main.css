@@ -273,6 +273,10 @@ body > .alert {
 
 /*Drag And Drop*/
 
+.dnd_live {
+	display: none;
+}
+
 .pop_elem {
 	position: relative;
 	overflow: hidden;
@@ -288,7 +292,6 @@ body > .alert {
 }
 
 .pop_elem div div {
-	opacity: 1;
 	margin: 0 10px;
 	display: inline-block;
 }
@@ -303,7 +306,15 @@ body > .alert {
 	background-color: rgb(0, 126, 255);
 }
 
-.dnd_live {
+.mov_elem {
+	position: relative;
+	overflow: hidden;
+	margin-top: -50px;
 	display: none;
+	height: 50px;
 }
 
+.mov_elem div {
+	float: right;
+	margin: 2px 15px;
+}

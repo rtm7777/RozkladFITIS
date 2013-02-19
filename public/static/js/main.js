@@ -187,37 +187,95 @@ function SendStreamSubjectData() { // Відправка Ajax на сервер 
 };
 
 function GetSubjects(group_val, message) {  // Отримання JSON занять для певної і їх відображення
+  $.ajax({
+    url: "/getsubjs",
+    dataType: "jsonp",
+    data: {
+      group: group_val,
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      var dnd_html = $(".dnd_live").html();
+      $("tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>'+dnd_html);
+      $.map(data.sources, function(item) {
+        if (item.tupe == "кожен") {
+          $('#'+item.daypair+' .subject_content').html('<p class="single_sub">'+item.subject+'</p>'+dnd_html);
+        } else if (item.tupe == "непарна") {
+          $('#'+item.daypair+' .subject_content p:first').removeClass("null").text(item.subject);
+        } else if (item.tupe == "парна") {
+          $('#'+item.daypair+' .subject_content p:last').removeClass("null").text(item.subject);
+        };
+      });
+      if (message == true) {
+        ShowMessage("info", "Вибрано групу " + group_val);
+      };
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
+
+function SingleModalWindow(elem) {
+  if ($("#group").val() !== "") {
+    $("#load_animation").show("fast");
+    $("#day").prop({value: elem.attr("customdata")});
+    $("#subject_add_modal div h3").text("Заняття - "+elem.attr("customdata").substring(1)+" пара");
+    $("#daycheck").prop({checked: false});
+    ClearSubModal();
+    EnableModalOdd();
     $.ajax({
-      url: "/getsubjs",
+      url: "/getsubjsmodal",
       dataType: "jsonp",
       data: {
-        group: group_val,
+        para: $("#day").val(),
+        group: $("#group").val(),
       },
       beforeSend: function() {
         $("#load_animation").show("fast");
       },
       success: function(data) {
-        var dnd_html = $(".dnd_live").html();
-        $("tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>'+dnd_html);
+        ClearSubModal();
         $.map(data.sources, function(item) {
-          if (item.tupe == "кожен") {
-            $('#'+item.daypair+' .subject_content').html('<p class="single_sub">'+item.subject+'</p>'+dnd_html);
-          } else if (item.tupe == "непарна") {
-            $('#'+item.daypair+' .subject_content p:first').removeClass("null").text(item.subject);
-          } else if (item.tupe == "парна") {
-            $('#'+item.daypair+' .subject_content p:last').removeClass("null").text(item.subject);
-          };
+            if (item.pair_type == "кожен") {
+              $("#daycheck").prop({checked: true});
+              $("#msub1").val(item.subject);
+              $("#mteach1").val(item.teacher);
+              $("#maud1").val(item.audience);
+              SetPeriodActive(1, item.period);
+              DisableModalOdd();
+            } else if (item.pair_type == "парна") {
+              $("#daycheck").prop({checked: false});
+              $("#msub2").val(item.subject);
+              $("#mteach2").val(item.teacher);
+              $("#maud2").val(item.audience);
+              SetPeriodActive(2, item.period);
+              EnableModalOdd();
+            } else if (item.pair_type == "непарна") {
+              $("#daycheck").prop({checked: false});
+              $("#msub1").val(item.subject);
+              $("#mteach1").val(item.teacher);
+              $("#maud1").val(item.audience);
+              SetPeriodActive(1, item.period);
+              EnableModalOdd();
+            };
         });
-        if (message == true) {
-          ShowMessage("info", "Вибрано групу " + group_val);
-        };
+        $('#subject_add_modal').modal('show');
         $("#load_animation").hide("fast");
       },
       error: function() {
-        ShowMessage("error", "Виникла помилка");
+        $('#subject_add_modal').modal('show');
+        ShowMessage("error", "Виникла помилка при завантаженні");
         $("#load_animation").hide("fast");
       }
     });
+  } else {
+    ShowMessage("error", "Спочатку виберіть групу");
+  };
 }
 
 $(function() {
@@ -349,69 +407,13 @@ function EnableModalOdd() {  //Розблокування правої част�
 $(document).ready(function() {
 
   $("#tab1 table tbody tr").dblclick(function() { //Виклик вікна додавання заняття
-    if ($("#group").val() !== "") {
-      var elem = $(this);
-      $("#load_animation").show("fast");
-      $("#day").prop({value: elem.attr("customdata")});
-      $("#subject_add_modal div h3").text("Заняття - "+elem.attr("customdata").substring(1)+" пара");
-      if (elem.find("td:last-child").html() !== '<p class="null"></p><hr><p class="null"></p>') {
-        $.ajax({
-          url: "/getsubjsmodal",
-          dataType: "jsonp",
-          data: {
-            para: $("#day").val(),
-            group: $("#group").val(),
-          },
-          beforeSend: function() {
-            $("#load_animation").show("fast");
-          },
-          success: function(data) {
-            ClearSubModal();
-            $.map(data.sources, function(item) {
-                if (item.pair_type == "кожен") {
-                  $("#daycheck").prop({checked: true});
-                  $("#msub1").val(item.subject);
-                  $("#mteach1").val(item.teacher);
-                  $("#maud1").val(item.audience);
-                  SetPeriodActive(1, item.period);
-                  DisableModalOdd();
-                } else if (item.pair_type == "парна") {
-                  $("#daycheck").prop({checked: false});
-                  $("#msub2").val(item.subject);
-                  $("#mteach2").val(item.teacher);
-                  $("#maud2").val(item.audience);
-                  SetPeriodActive(2, item.period);
-                  EnableModalOdd();
-                } else if (item.pair_type == "непарна") {
-                  $("#daycheck").prop({checked: false});
-                  $("#msub1").val(item.subject);
-                  $("#mteach1").val(item.teacher);
-                  $("#maud1").val(item.audience);
-                  SetPeriodActive(1, item.period);
-                  EnableModalOdd();
-                };
-            });
-            $('#subject_add_modal').modal('show');
-            $("#load_animation").hide("fast");
-          },
-          error: function() {
-            $('#subject_add_modal').modal('show');
-            ShowMessage("error", "Виникла помилка при завантаженні");
-            $("#load_animation").hide("fast");
-          }
-        });
-      } else {
-        $("#daycheck").prop({checked: false});
-        ClearSubModal();
-        EnableModalOdd();
-        $('#subject_add_modal').modal('show');
-        $("#load_animation").hide("fast");
-      };
-    } else {
-      ShowMessage("error", "Спочатку виберіть групу");
-    };
+    SingleModalWindow($(this));
   });
- 
+
+  $(document).on('click', ".mov_elem div button:first-child", function() {
+    SingleModalWindow($(this).parents("tr"));
+  });
+
   $(function () {  //функція для прокрутки сторінки вгору
       $(window).scroll(function () {
           if ($(this).scrollTop() > 110)
@@ -507,18 +509,12 @@ $(document).ready(function() {
 
 
 
-
-
-
-
-
-
   // HTML5 Drag And Drop
 
   $(".subject_content").on("dragstart", function(e) {
     e.originalEvent.dataTransfer.setData("Text", $(this).parent().attr("id"));
     $(this).addClass("drag_start");
-    $("td:last-child div").fadeIn();
+    $("td:last-child .pop_elem").not($(this).children()).show();
   });
 
   $(document).on('dragover', ".subject_content > div > div > div", function(e) {
@@ -558,11 +554,20 @@ $(document).ready(function() {
   });
 
   $("tr td:last-child").on('dragend', function (e) {
-    $("td:last-child div").fadeOut();
+    $("td:last-child .pop_elem").hide();
     $("td:last-child").removeClass("drag_enter");
     $(this).removeClass("drag_start");
-    
+  });
 
+
+  // Additional control elements
+
+  $(".subject_content").on("mouseout", function(e) {
+    $(this).children(".mov_elem").hide();
+  });
+
+  $(".subject_content").on("mouseover", function(e) {
+    $(this).children(".mov_elem").show();
   });
 
 });
