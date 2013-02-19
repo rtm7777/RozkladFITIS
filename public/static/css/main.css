@@ -288,16 +288,19 @@ body > .alert {
 }
 
 .pop_elem div div {
+	opacity: 1;
 	margin: 0 10px;
 	display: inline-block;
 }
 
 .drag_start {
-	opacity: 0.4 !important;
+	opacity: 0.4;
 }
 
 .drag_enter {
-	background-color: rgba(0, 126, 255, 0.4);
+	opacity: 1 !important;
+	color: black;
+	background-color: rgb(0, 126, 255);
 }
 
 .dnd_live {

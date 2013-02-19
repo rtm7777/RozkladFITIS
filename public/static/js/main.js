@@ -516,13 +516,13 @@ $(document).ready(function() {
   // HTML5 Drag And Drop
 
   $(".subject_content").on("dragstart", function(e) {
-    e.originalEvent.dataTransfer.setData("Text", "dsf");
+    e.originalEvent.dataTransfer.setData("Text", $(this).parent().attr("id"));
     $(this).addClass("drag_start");
     $("td:last-child div").fadeIn();
   });
 
   $(document).on('dragover', ".subject_content > div > div > div", function(e) {
-    e.preventDefault(); // Necessary. Allows us to drop.
+    e.preventDefault();
     return false;
   });
 
@@ -532,17 +532,27 @@ $(document).ready(function() {
   });
  
   $(document).on('dragleave', ".subject_content > div > div > div", function(e) {
-    $(this).removeClass("drag_enter");
+    var related = e.relatedTarget,
+    inside = false;
+    if (related !== this) {
+      if (related) {
+        inside = jQuery.contains(this, related);
+      }
+      if (!inside) {
+        $(this).removeClass("drag_enter");
+      }
+    }
     return false;
   });
 
-  $(document).on('drop', ".subject_content div div div", function(e) {
+  $(document).on('drop', ".subject_content > div > div > div", function(e) {
+    var drop_id = $(this).parents("tr").attr("id");
     var tbt = e.originalEvent.dataTransfer.getData("Text");
     e.preventDefault();
     if (e.stopPropagation) {
       e.stopPropagation();
     };
-    alert(tbt);
+    alert(tbt + $(this).attr("value") + drop_id);
     $(this).removeClass("drag_enter");
     return false;
   });
