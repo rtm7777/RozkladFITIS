@@ -84,7 +84,7 @@ class PairType(models.Model):
 	type_of_pair = models.CharField(max_length=15, verbose_name=u'тип пари')
 
 	def __unicode__(self):
-		return self.type_of_pair
+		return u'%s' % self.type_of_pair
 
 	class Meta:
 		verbose_name = u'Тип пари'
@@ -94,7 +94,7 @@ class PairPeriod(models.Model):
 	period = models.IntegerField()
 
 	def __unicode__(self):
-		return unicode(self.period)
+		return u'%s' % self.period
 
 	class Meta:
 		verbose_name = u"Період"

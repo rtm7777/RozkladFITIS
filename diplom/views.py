@@ -606,3 +606,51 @@ def experimental(request):
 
 def forum(request):
 	return render_to_response('forum.html')
+
+def dnd(request):
+	group = request.GET.get("group")
+	start_les = request.GET.get("from").split("_")
+	end_les = request.GET.get("to").split("_")
+	action = request.GET.get("action")
+	jquery = request.GET.get("callback")
+
+	les_start = Schedule.objects.filter(group__group_name = group, day__day__contains = start_les[0], pair__pair_number = start_les[1])
+	les_end = Schedule.objects.filter(group__group_name = group, day__day__contains = end_les[0], pair__pair_number = end_les[1])
+
+	for les in les_start:
+		les.delete()
+
+	for les in les_end:
+		les.delete()
+
+	if action == "swap":
+		for les in les_start:
+			les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
+				pair = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+				group = les.group,
+				teacher = les.teacher,
+				audience = les.audience, 
+				subject = les.subject)
+			les.save()
+		for les in les_end:
+			les = Schedule(day = Day.objects.get(day__contains=start_les[0]),
+				pair = Pair.objects.get(pair_number = start_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+				group = les.group,
+				teacher = les.teacher,
+				audience = les.audience, 
+				subject = les.subject)
+			les.save()
+	elif action == "replace":
+		for les in les_start:
+			les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
+				pair = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+				group = les.group,
+				teacher = les.teacher,
+				audience = les.audience, 
+				subject = les.subject)
+			les.save()
+
+	result = {}
+	result['status'] = "ok"
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')

@@ -8,7 +8,7 @@
 	-o-transform: rotate(270Zdeg);  /* Opera 10.5 */
 	-webkit-transform: rotate(270deg);  /* Saf3.1+, Chrome */
 	-ms-transform: rotate(270deg);
-	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=6.123031769111886e-17, M12=1, M21=-1, M22=6.123031769111886e-17, SizingMethod='auto expand')";
+	transform: rotate(270deg);
 }
 
 
@@ -252,13 +252,13 @@ body > .alert {
 	100% { -webkit-transform:rotate(360deg); }
 }
 @-o-keyframes spinPulse {
-	0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
-	50% { -webkit-transform:rotate(145deg); opacity:1;}
-	100% { -webkit-transform:rotate(-320deg); opacity:0; }
+	0% { -o-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+	50% { -o-transform:rotate(145deg); opacity:1;}
+	100% { -o-transform:rotate(-320deg); opacity:0; }
 }
 @-o-keyframes spinoffPulse {
-	0% { -webkit-transform:rotate(0deg); }
-	100% { -webkit-transform:rotate(360deg); }
+	0% { -o-transform:rotate(0deg); }
+	100% { -o-transform:rotate(360deg); }
 }
 @-keyframes spinPulse {
 	0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
@@ -307,6 +307,17 @@ body > .alert {
 }
 
 .mov_elem {
+	position: relative;
+	overflow: hidden;
+	margin-top: -50px;
+	display: none;
+	height: 50px;
+}
+
+.mov_elem div {
+	float: right;
+	margin: 2px 15px;
+}lem {
 	position: relative;
 	overflow: hidden;
 	margin-top: -50px;

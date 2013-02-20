@@ -542,13 +542,32 @@ $(document).ready(function() {
   });
 
   $(document).on('drop', ".subject_content > div > div > div", function(e) {
-    var drop_id = $(this).parents("tr").attr("id");
-    var tbt = e.originalEvent.dataTransfer.getData("Text");
     e.preventDefault();
     if (e.stopPropagation) {
       e.stopPropagation();
     };
-    alert(tbt + $(this).attr("value") + drop_id);
+    $.ajax({
+      url: "/dnd",
+      dataType: "jsonp",
+      data: {
+        group: $("#group").val(),
+        from: e.originalEvent.dataTransfer.getData("Text"),
+        to: $(this).parents("tr").attr("id"),
+        action: $(this).attr("value")
+      },
+      beforeSend: function() {
+        $("#load_animation").show("fast");
+      },
+      success: function(data) {
+        if ($("#group").val() !== "") {
+          GetSubjects($("#group").val(), false)
+        };
+      },
+      error: function() {
+        ShowMessage("error", "Виникла помилка")
+        $("#load_animation").hide("fast");
+      }
+    });
     $(this).removeClass("drag_enter");
     return false;
   });

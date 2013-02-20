@@ -11,11 +11,12 @@ urlpatterns = patterns('',
 	(r'ac$', 'diplom.views.predmet_autocomplite'), #обробка автозаповнення предмету
 	(r'tch$', 'diplom.views.teacher_autocomplite'), #обробка автозаповнення викладача
 	(r'au$', 'diplom.views.audience_autocomplite'), #обробка автозаповнення аудиторiї
-	(r'sendsubj$', 'diplom.views.pair_add'), #відправка запросу на додавання заняття
-	(r'sendstreamsubj$', 'diplom.views.pair_stream_add'), #відправка запросу на додавання потокового заняття
+	(r'sendsubj$', 'diplom.views.pair_add'), #відправка запиту на додавання заняття
+	(r'sendstreamsubj$', 'diplom.views.pair_stream_add'), #відправка запиту на додавання потокового заняття
 	(r'getsubjs$', 'diplom.views.group_subjs'), #повертає всі пари для групи
 	(r'getsubjsingle$', 'diplom.views.getsubjsingle'), #повертає предмети для певного дня і пари
 	(r'getsubjsmodal$', 'diplom.views.getsubjsmodal'), #повертає предмети пари і вводить їх в модальне вікно
+	(r'dnd$', 'diplom.views.dnd'), #відправка запиту при перетягуванні заняття
 	(r'login$', 'diplom.views.ajax_login'),
 	(r'^logout/$', logout, {'template_name': 'login.html'}),
 	# Uncomment the admin/doc line below to enable admin documentation:
