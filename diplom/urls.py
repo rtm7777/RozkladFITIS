@@ -8,15 +8,16 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-	(r'ac$', 'diplom.views.predmet_autocomplite'), #обробка автозаповнення предмету
-	(r'tch$', 'diplom.views.teacher_autocomplite'), #обробка автозаповнення викладача
-	(r'au$', 'diplom.views.audience_autocomplite'), #обробка автозаповнення аудиторiї
-	(r'sendsubj$', 'diplom.views.pair_add'), #відправка запиту на додавання заняття
-	(r'sendstreamsubj$', 'diplom.views.pair_stream_add'), #відправка запиту на додавання потокового заняття
-	(r'getsubjs$', 'diplom.views.group_subjs'), #повертає всі пари для групи
-	(r'getsubjsingle$', 'diplom.views.getsubjsingle'), #повертає предмети для певного дня і пари
-	(r'getsubjsmodal$', 'diplom.views.getsubjsmodal'), #повертає предмети пари і вводить їх в модальне вікно
-	(r'dnd$', 'diplom.views.dnd'), #відправка запиту при перетягуванні заняття
+	(r'ac$', 'rozklad.views.predmet_autocomplite'), #обробка автозаповнення предмету
+	(r'tch$', 'rozklad.views.teacher_autocomplite'), #обробка автозаповнення викладача
+	(r'au$', 'rozklad.views.audience_autocomplite'), #обробка автозаповнення аудиторiї
+	(r'sendsubj$', 'rozklad.views.pair_add'), #відправка запиту на додавання заняття
+	(r'sendstreamsubj$', 'rozklad.views.pair_stream_add'), #відправка запиту на додавання потокового заняття
+	(r'getsubjs$', 'rozklad.views.group_subjs'), #повертає всі пари для групи
+	(r'getsubjsingle$', 'rozklad.views.getsubjsingle'), #повертає предмети для певного дня і пари
+	(r'getsubjsmodal$', 'rozklad.views.getsubjsmodal'), #повертає предмети пари і вводить їх в модальне вікно
+	(r'dnd$', 'rozklad.views.dnd'), #відправка запиту при перетягуванні заняття
+
 	(r'login$', 'diplom.views.ajax_login'),
 	(r'^logout/$', logout, {'template_name': 'login.html'}),
 	# Uncomment the admin/doc line below to enable admin documentation:
@@ -34,6 +35,6 @@ urlpatterns = patterns('',
 
 	# Uncomment the next line to enable the admin:
 	(r'^admin/', include(admin.site.urls)),
-	(r'^rozklad_admin/$', 'diplom.views.rozklad_admin'),
+	(r'^rozklad_admin/$', 'rozklad.views.rozklad_admin'),
 	('^$', 'diplom.views.main'),
 )
