@@ -34,6 +34,10 @@
 	display: none;
 }
 
+.modal-footer .modal_message_adv {
+	display: none;
+}
+
 .modal-footer .modal_buttons {
 	float: right;
 }
@@ -44,6 +48,10 @@
 
 .modal-body {
 	overflow: visible;
+}
+
+.modal_message p b button, .modal_message p b span {
+	margin: 0 5px;
 }
 
 /*Оформлення контейнера для модального вікна set_predmet*/
@@ -307,17 +315,6 @@ body > .alert {
 }
 
 .mov_elem {
-	position: relative;
-	overflow: hidden;
-	margin-top: -50px;
-	display: none;
-	height: 50px;
-}
-
-.mov_elem div {
-	float: right;
-	margin: 2px 15px;
-}lem {
 	position: relative;
 	overflow: hidden;
 	margin-top: -50px;

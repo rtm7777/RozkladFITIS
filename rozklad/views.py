@@ -144,7 +144,8 @@ def pair_add(request):
 
 	pair_add.errors = ""
 	pair_add.errors_message = "Некорректно введено:"
-	pair_add.lining = 0
+	pair_add.lining = ""
+	pair_add.lin_count = 0
 
 	def delete_objects(objects):
 		for schedule in schedules:
@@ -219,10 +220,16 @@ def pair_add(request):
 			pair_add.errors = "true"
 
 	def check_lining_teacher(teacher):
-		pair_add.lining = Schedule.objects.filter(day__day = day, pair__pair_number = pair, teacher__teacher_last_name =  teacher[0], teacher__teacher_first_name = teacher[1], teacher__teacher_middle_name = teacher[2]).count()
+		pair_add.lin_count = Schedule.objects.filter(day__day = day, pair__pair_number = pair, teacher__teacher_last_name =  teacher[0], teacher__teacher_first_name = teacher[1], teacher__teacher_middle_name = teacher[2]).count()
+		if pair_add.lin_count != 0:
+			pair_add.lining = "true"
+			pair_add.errors = "true"
 
 	def check_lining_audience(audience):
-		pair_add.lining = Schedule.objects.filter(day__day = day, pair__pair_number = pair, audience__number_of_audience = audience[0], audience__housing__number_of_housing = audience[1]).count()
+		pair_add.lin_count = Schedule.objects.filter(day__day = day, pair__pair_number = pair, audience__number_of_audience = audience[0], audience__housing__number_of_housing = audience[1]).count()
+		if pair_add.lin_count != 0:
+			pair_add.lining = "true"
+			pair_add.errors = "true"
 
 	subject1 = request.GET.get("subject1")
 	if subject1:
@@ -249,8 +256,9 @@ def pair_add(request):
 		else:
 			error_check1()
 			if pair_add.errors != "true":
-				full_save_schedule()
 				check_lining_teacher(teacher1)
+				if pair_add.lining != "true":
+					full_save_schedule()
 
 	elif evenodd == "false":
 		if subject1 == "" and subject2 =="":
