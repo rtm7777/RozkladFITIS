@@ -142,7 +142,7 @@ function SendSubjectData(lining) {  // Відправка Ajax на сервер
           ShowModalMessageAdv("#subject_add_modal", "Можлива накладка");
         } else {
           $("#load_animation").hide("fast");
-          ShowModalMessage("#subject_add_modal", data.errors_message);
+          ShowModalMessage("#subject_add_modal", data.lin_mes);
         };
       };
     },
@@ -636,6 +636,10 @@ $(document).ready(function() {
   $(".subject_content").on("mouseover", function(e) {
     $(this).children(".mov_elem").show();
   });
+
+});
+
+
 
 });
 
