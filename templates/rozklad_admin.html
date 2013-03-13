@@ -39,10 +39,14 @@
 					<div id="opt_audiences" class=" opt_hide">
 						<ul class="nav nav-list well">
 							<li class="nav-header">Опції</li>
-							<li><a href="#">корпус</a></li>
-							<li class="divider"></li>
-							<li class="nav-header">Додатково</li>
-							<li><a href="#">парні-непарні тижні</a></li>
+							<li class="dropdown-submenu">
+								<a id="house_num" tabindex="-1" href="#">корпус</a>
+								<ul id="house_id" class="dropdown-menu">
+									{%for house in houses%}
+										<li><a href="#" value="{{house}}">{{house}} - корпус</a></li>
+									{%endfor%}
+								</ul>
+							</li>
 						</ul>
 					</div>
 					<div id="opt_teachers" class=" opt_hide">
@@ -389,7 +393,29 @@
 								</div>
 							</div>
 							<div id="tab2" class="tab-pane fade">
-								<p>2 vkladka</p>
+								<input id="tab2_house" type="text">
+								<div class="btn-group" data-toggle="buttons-radio">
+									{%for day in days%}
+										{%if day == '1Понеділок'%}
+										<button type="button" class="btn btn-small active" value="{{day}}">{{day|slice:"1:"}}</button>
+										{%else%}
+										<button type="button" class="btn btn-small" value="{{day}}">{{day|slice:"1:"}}</button>
+										{%endif%}
+									{%endfor%}
+								</div>
+								<table class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th class="group_pair">Аудиторія / Пара</th>
+											{%for pair in pairs%}
+											<th colspan="2">{{pair}}</th>
+											{%endfor%}
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>
 							</div>
 							<div id="tab3" class="tab-pane fade">
 								<p>3 vkladka</p>

@@ -284,7 +284,50 @@ function SingleModalWindow(elem) {  // Отримання JSON занять дл
   } else {
     ShowMessage("error", "Спочатку виберіть групу");
   }; 
-}
+};
+
+function GetAudEmployment(house, day) {
+  $.ajax({
+    url: "/getaudemp",
+    dataType: "jsonp",
+    data: {
+      house: house,
+      day: day
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      $("#tab2 table tbody").html(" ");
+      $.map(data.audiences, function(item) {
+        $("#tab2 table tbody").append("<tr class=" + item.number + "><th>" + item.number + "</th><th class='I1'><p></p></th><th class='I2'><p></p></th><th class='II1'><p></p></th><th class='II3'><p></p></th><th class='III1'><p></p></th><th class='III2'><p></p></th><th class='IV1'><p></p></th><th class='IV2'><p></p></th><th class='V1'><p></p></th><th class='V2'><p></p></th><th class='VI1'><p></p></th><th class='VI2'><p></p></th></tr>");
+        $.map(item.pairs,  function(i) {
+          var period_bool = false;
+          var periods = "";
+          var type = 0;
+          if (i.type == "непарна") {
+            type = 1
+          } else if (i.type == "парна") {
+            type = 2
+          }else if (i.type == "кожен") {
+            period_bool = true;
+          };
+          if (period_bool) {
+            $("#tab2 table tbody ." + item.number + " ." + i.num + "1").addClass("bysy_cell");
+            $("#tab2 table tbody ." + item.number + " ." + i.num + "2").addClass("bysy_cell");
+          } else {
+            $("#tab2 table tbody ." + item.number + " ." + i.num + type).addClass("bysy_cell");
+          };
+        });
+      });
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
 
 $(function() { // Функція для входу користувача (Ajax)
   $("#send_login").click(function() {
@@ -482,7 +525,23 @@ $(document).ready(function() {
     var group = $(this);
     $("#group").prop({value: group.attr("value")});
     $("#group_name").text("Група - " + group.attr("value"));
-    GetSubjects(group.attr("value"), true)
+    GetSubjects(group.attr("value"), true);
+  });
+
+  $("#house_id li a").click(function() {  // Відображення зайнятості аудиторій
+    var house = $(this);
+    $("#tab2_house").prop({value: house.attr("value")});
+    $("#house_num").text(house.attr("value") + " - корпус");
+    GetAudEmployment($("#tab2_house").val(), $("#tab2 div button.active").val());
+  });
+
+  $("#tab2 div button").click(function() {
+    var day = $(this);
+    if ($("#tab2_house").val() !== "") {
+      GetAudEmployment($("#tab2_house").val(), day.attr("value"));
+    } else{
+      ShowMessage("error", "Виберіть корпус");
+    };
   });
 
   $("#daycheck").click(function() {  // Зміна стану діалогового вікна заняття
@@ -636,10 +695,6 @@ $(document).ready(function() {
   $(".subject_content").on("mouseover", function(e) {
     $(this).children(".mov_elem").show();
   });
-
-});
-
-
 
 });
 

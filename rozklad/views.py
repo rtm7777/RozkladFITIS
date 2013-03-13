@@ -41,10 +41,14 @@ def rozklad_admin(request):
 	days = days_in_week
 	pairs = pair_in_day
 	groups = Group.objects.order_by("group_name")
+	houses = Housing.objects.all()
 	groups_list = []
+	houses_list = []
 	for g in groups:
 		groups_list.append(g.group_name)
-	return render_to_response('rozklad_admin.html', {'days': days, 'pairs': pairs, 'groups': groups_list})
+	for h in houses:
+		houses_list.append(str(h.number_of_housing))
+	return render_to_response('rozklad_admin.html', {'days': days, 'pairs': pairs, 'groups': groups_list, 'houses': houses_list})
 
 def predmet_autocomplite(request):
 	subjects = Subject.objects.all()
@@ -225,7 +229,6 @@ def pair_add(request):
 		pair_add.lin_count = lessons.count()
 
 		if pair_add.lin_count != 0:
-			
 			for lesson in lessons:
 				if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
 					pair_add.lin_mes = "eo-"
@@ -547,6 +550,36 @@ def dnd(request):
 			les.save()
 
 	result = {}
+	result['status'] = "ok"
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def getaudemp(request):
+	house = request.GET.get("house")
+	day = request.GET.get("day")
+	jquery = request.GET.get("callback")
+
+	audiences = Audience.objects.filter(housing__number_of_housing = house)
+	schedules = Schedule.objects.filter(day__day = day, audience__housing__number_of_housing = house)
+
+	result = {}
+	res = []
+
+	for audience in audiences:
+		aud = {}
+		pairs = []
+		aud['number'] = audience.number_of_audience
+		for schedule in schedules:
+			items = {}
+			if audience == schedule.audience:
+				items["num"] = schedule.pair.pair_number
+				items["type"] = schedule.pair.pair_type.type_of_pair
+				items["period"] = str(schedule.pair.pair_period.period)
+			pairs.append(items)
+		aud["pairs"] = pairs
+		res.append(aud)
+	result['audiences'] = res
+
 	result['status'] = "ok"
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
