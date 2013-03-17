@@ -570,15 +570,45 @@ def getaudemp(request):
 		pairs = []
 		aud['number'] = audience.number_of_audience
 		for schedule in schedules:
-			items = {}
 			if audience == schedule.audience:
+				items = {}
 				items["num"] = schedule.pair.pair_number
 				items["type"] = schedule.pair.pair_type.type_of_pair
 				items["period"] = str(schedule.pair.pair_period.period)
-			pairs.append(items)
+				pairs.append(items)
 		aud["pairs"] = pairs
 		res.append(aud)
 	result['audiences'] = res
+
+	result['status'] = "ok"
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def getteachemp(request):
+	house = request.GET.get("house")
+	day = request.GET.get("day")
+	jquery = request.GET.get("callback")
+
+	teachers = Teacher.objects.all()
+	schedules = Schedule.objects.filter(day__day = day)
+
+	result = {}
+	res = []
+
+	for teacher in teachers:
+		teach = {}
+		pairs = []
+		teach['name'] = teacher.teacher_last_name + "_" + teacher.teacher_first_name + "_" + teacher.teacher_middle_name
+		for schedule in schedules:
+			if teacher == schedule.teacher:
+				items = {}
+				items["num"] = schedule.pair.pair_number
+				items["type"] = schedule.pair.pair_type.type_of_pair
+				items["period"] = str(schedule.pair.pair_period.period)
+				pairs.append(items)
+		teach["pairs"] = pairs
+		res.append(teach)
+	result['teachers'] = res
 
 	result['status'] = "ok"
 	json = jquery+'('+simplejson.dumps(result)+')'

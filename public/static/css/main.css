@@ -75,12 +75,10 @@
 	background-color: #0bf !important;
 }
 
-/*Відступ таблиці в 2 вкладці  ##########################################*/  
-#tab2 div {
+/*Відступ таблиці в 2 i 3 вкладці  ##########################################*/  
+#tab2 div, #tab3 div {
 	margin-bottom: 10px;
 }
-
-
 
 #tab2 table tbody tr th:not(:first-child) {
 	table-layout:fixed;
@@ -88,9 +86,10 @@
 	height: 10px;
 }
 
-/*для вставки в таблицю зайнятості аудиторій*/
-#taudinsede { 
-	display: none;
+#tab3 table tbody tr th:not(:first-child) {
+	table-layout:fixed;
+	width: 15px;
+	height: 10px;
 }
 
 /*Колір тексту для неактивної колонки set_predmet*/
@@ -354,4 +353,5 @@ body > .alert {
 .mov_elem div {
 	float: right;
 	margin: 2px 15px;
+} 15px;
 }

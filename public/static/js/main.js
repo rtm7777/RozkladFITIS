@@ -329,6 +329,48 @@ function GetAudEmployment(house, day) {
   });
 };
 
+function GetTeachEmployment(day) {
+  $.ajax({
+    url: "/getteachemp",
+    dataType: "jsonp",
+    data: {
+      day: day
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      $("#tab3 table tbody").html(" ");
+      $.map(data.teachers, function(item) {
+        $("#tab3 table tbody").append("<tr class=" + item.name + "><th>" + item.name + "</th><th class='I1'><p></p></th><th class='I2'><p></p></th><th class='II1'><p></p></th><th class='II3'><p></p></th><th class='III1'><p></p></th><th class='III2'><p></p></th><th class='IV1'><p></p></th><th class='IV2'><p></p></th><th class='V1'><p></p></th><th class='V2'><p></p></th><th class='VI1'><p></p></th><th class='VI2'><p></p></th></tr>");
+        $.map(item.pairs,  function(i) {
+          var period_bool = false;
+          var periods = "";
+          var type = 0;
+          if (i.type == "непарна") {
+            type = 1
+          } else if (i.type == "парна") {
+            type = 2
+          }else if (i.type == "кожен") {
+            period_bool = true;
+          };
+          if (period_bool) {
+            $("#tab3 table tbody ." + item.name + " ." + i.num + "1").addClass("bysy_cell");
+            $("#tab3 table tbody ." + item.name + " ." + i.num + "2").addClass("bysy_cell");
+          } else {
+            $("#tab3 table tbody ." + item.name + " ." + i.num + type).addClass("bysy_cell");
+          };
+        });
+      });
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
+
 $(function() { // Функція для входу користувача (Ajax)
   $("#send_login").click(function() {
     $.ajax({
@@ -528,20 +570,35 @@ $(document).ready(function() {
     GetSubjects(group.attr("value"), true);
   });
 
-  $("#house_id li a").click(function() {  // Відображення зайнятості аудиторій
+  $("#house_id li a").click(function() {  // Відображення зайнятості аудиторій - корпус
     var house = $(this);
     $("#tab2_house").prop({value: house.attr("value")});
     $("#house_num").text(house.attr("value") + " - корпус");
     GetAudEmployment($("#tab2_house").val(), $("#tab2 div button.active").val());
   });
 
-  $("#tab2 div button").click(function() {
+  $("#tab2 div button").click(function() {  // Відображення зайнятості аудиторій - день
     var day = $(this);
     if ($("#tab2_house").val() !== "") {
       GetAudEmployment($("#tab2_house").val(), day.attr("value"));
     } else{
       ShowMessage("error", "Виберіть корпус");
     };
+  });
+
+  $("a[href='#tab2']").click(function() {
+    if ($("#tab2_house").val() !== "") {
+      GetAudEmployment($("#tab2_house").val(), $("#tab2 div button.active").val());
+    };
+  });
+
+  $("#tab3 div button").click(function() {  // Відображення зайнятості викладачів - день
+    var day = $(this);
+    GetTeachEmployment(day.attr("value"));
+  });
+
+  $("a[href='#tab3']").click(function() {
+    GetTeachEmployment($("#tab3 div button.active").val());
   });
 
   $("#daycheck").click(function() {  // Зміна стану діалогового вікна заняття

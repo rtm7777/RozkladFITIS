@@ -28,7 +28,6 @@
 									{%endfor%}
 								</ul>
 							</li>
-							<li><a href="#">навантаження</a></li>
 							<li class="divider"></li>
 							<li class="nav-header">Додатково</li>
 							<li><a href="#add_stream_modal" data-toggle="modal">додати потокове заняття</a></li>
@@ -52,7 +51,6 @@
 					<div id="opt_teachers" class=" opt_hide">
 						<ul class="nav nav-list well">
 							<li class="nav-header">Опції</li>
-							<li><a href="#">навантаження</a></li>
 						</ul>
 					</div>
 					<div id="opt_task" class=" opt_hide">
@@ -418,7 +416,28 @@
 								</table>
 							</div>
 							<div id="tab3" class="tab-pane fade">
-								<p>3 vkladka</p>
+								<div class="btn-group" data-toggle="buttons-radio">
+									{%for day in days%}
+										{%if day == '1Понеділок'%}
+										<button type="button" class="btn btn-small active" value="{{day}}">{{day|slice:"1:"}}</button>
+										{%else%}
+										<button type="button" class="btn btn-small" value="{{day}}">{{day|slice:"1:"}}</button>
+										{%endif%}
+									{%endfor%}
+								</div>
+								<table class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th class="group_pair">Викладач / Пара</th>
+											{%for pair in pairs%}
+											<th colspan="2">{{pair}}</th>
+											{%endfor%}
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>
 							</div>
 							<div id="tab4" class="tab-pane fade">
 								<p>просмотр</p>
