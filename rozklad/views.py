@@ -142,6 +142,7 @@ def pair_add(request):
 	day = day_pair[0]
 	pair = day_pair[1]
 	evenodd = request.GET.get("evenodd")
+	lining_check = request.GET.get("lining")
 
 	schedules = Schedule.objects.all()
 	pairs_objects = Pair.objects.filter(pair_number = pair)
@@ -149,7 +150,8 @@ def pair_add(request):
 	pair_add.errors = ""
 	pair_add.errors_message = "Некорректно введено:"
 	pair_add.lining = ""
-	pair_add.lin_count = 0
+	pair_add.lin_count_t = 0
+	pair_add.lin_count_a = 0
 	pair_add.lin_mes = ""
 
 	def delete_objects(objects):
@@ -226,34 +228,53 @@ def pair_add(request):
 
 	def check_lining_teacher(teacher, period, eo="кожен"):
 		lessons = Schedule.objects.filter(day__day = day, pair__pair_number = pair, teacher__teacher_last_name =  teacher[0], teacher__teacher_first_name = teacher[1], teacher__teacher_middle_name = teacher[2])
-		pair_add.lin_count = lessons.count()
+		lessons = lessons.exclude(day__day = day, pair__pair_number = pair, group__group_name = group_val)
+		pair_add.lin_count_t = lessons.count()
 
-		if pair_add.lin_count != 0:
+		if pair_add.lin_count_t != 0:
 			for lesson in lessons:
 				if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
 					pair_add.lin_mes = "eo-"
-					if int(period) == 1:
+					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-					elif int(period) == lesson.pair.pair_period.period:
+					elif int(period) == lesson.pair.pair_period.period or 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8"):
-					
+				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or "кожен":
 					pair_add.lin_mes = lesson.pair.pair_period.period
-					if int(period) == 1:
+					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-					elif int(period) == lesson.pair.pair_period.period:
+					elif int(period) == lesson.pair.pair_period.period or 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
 
 
-	def check_lining_audience(audience):
-		pair_add.lin_count = Schedule.objects.filter(day__day = day, pair__pair_number = pair, audience__number_of_audience = audience[0], audience__housing__number_of_housing = audience[1]).count()
-		if pair_add.lin_count != 0:
-			pair_add.lining = "true"
-			pair_add.errors = "true"
+	def check_lining_audience(audience, period, eo="кожен"):
+		lessons = Schedule.objects.filter(day__day = day, pair__pair_number = pair, audience__number_of_audience = audience[0], audience__housing__number_of_housing = audience[1])
+		lessons = lessons.exclude(day__day = day, pair__pair_number = pair, group__group_name = group_val)
+		pair_add.lin_count_a = lessons.count()
+
+		if pair_add.lin_count_a != 0:
+			for lesson in lessons:
+				if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
+					pair_add.lin_mes = "eo-"
+					if lesson.pair.pair_period.period == 1:
+						pair_add.errors = "true"
+						pair_add.lining = "true"
+					elif int(period) == lesson.pair.pair_period.period or 1:
+						pair_add.errors = "true"
+						pair_add.lining = "true"
+				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or "кожен":
+					pair_add.lin_mes = lesson.pair.pair_period.period
+					if lesson.pair.pair_period.period == 1:
+						pair_add.errors = "true"
+						pair_add.lining = "true"
+					elif int(period) == lesson.pair.pair_period.period or 1:
+						pair_add.errors = "true"
+						pair_add.lining = "true"
+
 
 	subject1 = request.GET.get("subject1")
 	if subject1:
@@ -280,8 +301,12 @@ def pair_add(request):
 		else:
 			error_check1()
 			if pair_add.errors != "true":
-				check_lining_teacher(teacher1, period1)
-				if pair_add.lining != "true":
+				if lining_check == "true":
+					check_lining_teacher(teacher1, period1)
+					check_lining_audience(audience1_split, period1)
+					if pair_add.lining != "true":
+						full_save_schedule()
+				else:
 					full_save_schedule()
 
 	elif evenodd == "false":
@@ -290,31 +315,43 @@ def pair_add(request):
 		elif subject2 == "":
 			error_check1()
 			if pair_add.errors != "true":
-				check_lining_teacher(teacher1, period1, "непарна")
-				if pair_add.lining != "true":
+				if lining_check == "true":
+					check_lining_teacher(teacher1, period1, "непарна")
+					check_lining_audience(audience1_split, period1, "непарна")
+					if pair_add.lining != "true":
+						full_save_schedule()
+				else:
 					full_save_schedule()
 		elif subject1 == "":
 			error_check2()
 			if pair_add.errors != "true":
-				check_lining_teacher(teacher2, period2, "парна")
-				if pair_add.lining != "true":
+				if lining_check == "true":
+					check_lining_teacher(teacher2, period2, "парна")
+					check_lining_audience(audience2_split, period2, "парна")
+					if pair_add.lining != "true":
+						full_save_schedule()
+				else:
 					full_save_schedule()
 		else:
 			error_check1()
 			error_check2()
 			if pair_add.errors != "true":
-				check_lining_teacher(teacher1, period1, "непарна")
-				check_lining_teacher(teacher2, period2, "парна")
-				if pair_add.lining != "true":
+				if lining_check == "true":
+					check_lining_teacher(teacher1, period1, "непарна")
+					check_lining_audience(audience1_split, period1, "непарна")
+					check_lining_teacher(teacher2, period2, "парна")
+					check_lining_audience(audience2_split, period2, "парна")
+					if pair_add.lining != "true":
+						full_save_schedule()
+				else:
 					full_save_schedule()
-		
 		
 
 	result = {}
 	result['errors'] = pair_add.errors
 	result['errors_message'] = pair_add.errors_message[:-1]
 	result['lining'] = pair_add.lining
-	result['count'] = pair_add.lin_count
+	result['count'] = str(pair_add.lin_count_t) + " __ " + str(pair_add.lin_count_a)
 	result['lin_mes'] = pair_add.lin_mes
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')

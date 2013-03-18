@@ -586,7 +586,7 @@ $(document).ready(function() {
     };
   });
 
-  $("a[href='#tab2']").click(function() {
+  $("a[href='#tab2']").click(function() { // Оновлення при виборі вкладки
     if ($("#tab2_house").val() !== "") {
       GetAudEmployment($("#tab2_house").val(), $("#tab2 div button.active").val());
     };
@@ -597,7 +597,7 @@ $(document).ready(function() {
     GetTeachEmployment(day.attr("value"));
   });
 
-  $("a[href='#tab3']").click(function() {
+  $("a[href='#tab3']").click(function() {  // Оновлення при виборі вкладки
     GetTeachEmployment($("#tab3 div button.active").val());
   });
 
