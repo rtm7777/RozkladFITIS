@@ -1,5 +1,5 @@
 from django.contrib import admin
-from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, PairPeriod, Pair, Day, Schedule
+from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, PairPeriod, Pair, Day, Schedule, TaskChair, Department
 
 class GroupAdmin(admin.ModelAdmin):
 	list_display = ('group_name', 'number_of_students')
@@ -34,7 +34,11 @@ class ScheduleAdmin(admin.ModelAdmin):
 	list_display = ('group', 'day', 'pair', 'subject', 'audience', 'teacher')
 	search_fields = ('group', 'sybject', 'audience')
 
+class TaskChairAdmin(admin.ModelAdmin):
+	list_display = ('group', 'teacher', 'subject', 'duration', 'audience')
 
+class DepartmentAdmin(admin.ModelAdmin):
+	list_display = ('department_name', 'department_full_name')
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Teacher, TeacherAdmin)
@@ -48,3 +52,5 @@ admin.site.register(PairPeriod)
 admin.site.register(Pair, PairAdmin)
 admin.site.register(Day, DayAdmin)
 admin.site.register(Schedule, ScheduleAdmin)
+admin.site.register(TaskChair, TaskChairAdmin)
+admin.site.register(Department, DepartmentAdmin)

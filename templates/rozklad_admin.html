@@ -134,17 +134,17 @@
 												<input id="group" type="text">
 												<div class="input-append">
 													<label for="msub1">Предмет: </label>
-													<input id="msub1" type="text" name="predmet" autocomplite="on"/>
+													<input id="msub1" type="text"/>
 													<button type="button" class="btn" value="#msub1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="mteach1">Викладач: </label>
-													<input id="mteach1" type="text" name="teacher" autocomplite="on"/>
+													<input id="mteach1" type="text"/>
 													<button type="button" class="btn" value="#mteach1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="maud1">Аудиторія: </label>
-													<input id="maud1" type="text" autocomplite="on"/>
+													<input id="maud1" type="text"/>
 													<button type="button" class="btn" value="#maud1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="btn-group" id="btn-group1" data-toggle="buttons-radio">
@@ -157,17 +157,17 @@
 											<div class="modal_cont2">
 												<div class="input-append">
 													<label for="msub2">Предмет: </label>
-													<input id="msub2" type="text" name="predmet" autocomplite="on"/>
+													<input id="msub2" type="text"/>
 													<button type="button" class="btn" value="#msub2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="mteach2">Викладач: </label>
-													<input id="mteach2" type="text" name="teacher" autocomplite="on"/>
+													<input id="mteach2" type="text"/>
 													<button type="button" class="btn" value="#mteach2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="maud2">Аудиторія: </label>
-													<input id="maud2" type="text" autocomplite="on"/>
+													<input id="maud2" type="text"/>
 													<button type="button" class="btn" value="#maud2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="btn-group" id="btn-group2" data-toggle="buttons-radio">
@@ -260,17 +260,17 @@
 												<input id="stream_groups" type="text">
 												<div class="input-append">
 													<label for="ssub1">Предмет: </label>
-													<input id="ssub1" type="text" name="predmet" autocomplite="on"/>
+													<input id="ssub1" type="text"/>
 													<button type="button" class="btn" value="#ssub1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="steach1">Викладач: </label>
-													<input id="steach1" type="text" name="teacher" autocomplite="on"/>
+													<input id="steach1" type="text"/>
 													<button type="button" class="btn" value="#steach1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="saud1">Аудиторія: </label>
-													<input id="saud1" type="text" autocomplite="on"/>
+													<input id="saud1" type="text"/>
 													<button type="button" class="btn" value="#saud1"><i class="icon-remove"></i></button>
 												</div>
 												<div class="btn-group" id="stream-btn-group1" data-toggle="buttons-radio">
@@ -283,17 +283,17 @@
 											<div class="modal_cont2">
 												<div class="input-append">
 													<label for="ssub2">Предмет: </label>
-													<input id="ssub2" type="text" name="predmet" autocomplite="on"/>
+													<input id="ssub2" type="text"/>
 													<button type="button" class="btn" value="#ssub2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="steach2">Викладач: </label>
-													<input id="steach2" type="text" name="teacher" autocomplite="on"/>
+													<input id="steach2" type="text"/>
 													<button type="button" class="btn" value="#steach2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="input-append">
 													<label for="saud2">Аудиторія: </label>
-													<input id="saud2" type="text" autocomplite="on"/>
+													<input id="saud2" type="text"/>
 													<button type="button" class="btn" value="#saud2"><i class="icon-remove"></i></button>
 												</div>
 												<div class="btn-group" id="stream-btn-group2" data-toggle="buttons-radio">
@@ -447,43 +447,50 @@
 										<h3>Додавання завдання</h3>
 									</div>
 									<div class="modal-body">
-										<div class="modal_cont1">
-											<div>
-												<label for="sub_task">Назва дисципліни: </label>
-												<input id="sub_m_tast" type="text"/>
-											</div>
-											<div>
-												<label for="group_task">Назва групи: </label>
-												<input id="group_task" type="text"/>
-											</div>
-											<div class="ui-widget">
-												<label for="tag2">Викладач: </label>
-												<input id="tag2" type="text" name="teacher"/>
-											</div>
-										</div>
-										<div class="modal_cont2">
-											<div>
-												<p>Вид заняття: </p>
-												<div class="btn-group" id="btn-group2" data-toggle="buttons-radio">
-													<button type="button" class="btn active" title="Лекція" value="1">Лек</button>
-													<button type="button" class="btn" title="Лабораторна" value="2">Лаб</button>
-													<button type="button" class="btn" title="Практика" value="3">Практ</button>
+										<div class="modal_container">
+											<div class="modal_cont1">
+												<div class="input-append">
+													<label for="sub_task">Назва дисципліни: </label>
+													<input id="sub_task" type="text"/>
+													<button type="button" class="btn" value="#sub_task"><i class="icon-remove"></i></button>
+												</div>
+												<div class="input-append">
+													<label for="group_task">Назва групи: </label>
+													<input id="group_task" type="text"/>
+													<button type="button" class="btn" value="#group_task"><i class="icon-remove"></i></button>
+												</div>
+												<div class="input-append">
+													<label for="teach_task">Викладач: </label>
+													<input id="teach_task" type="text"/>
+													<button type="button" class="btn" value="#teach_task"><i class="icon-remove"></i></button>
 												</div>
 											</div>
-											<div>
-												<p>Годин на тиждень: </p>
-												<div class="btn-group" id="btn-group2" data-toggle="buttons-radio">
-													<button type="button" class="btn" title="0.5 годин на тиждень" value="0.5">0.5</button>
-													<button type="button" class="btn active" title="1 година на тиждень" value="1">1</button>
-													<button type="button" class="btn" title="1.5 години на тиждень" value="1.5">1.5</button>
-													<button type="button" class="btn" title="2 години на тиждень" value="2">2</button>
+											<div class="modal_cont2">
+												<div>
+													<p>Годин на тиждень: </p>
+													<div class="btn-group" id="task-btn-group2" data-toggle="buttons-radio">
+														<button type="button" class="btn" title="0.5 годин на тиждень" value="0.5">0.5</button>
+														<button type="button" class="btn active" title="1 година на тиждень" value="1">1</button>
+														<button type="button" class="btn" title="1.5 години на тиждень" value="1.5">1.5</button>
+														<button type="button" class="btn" title="2 години на тиждень" value="2">2</button>
+													</div>
+												</div>
+												<div class="input-append">
+													<label for="aud_task">Аудиторія(не обов'язково): </label>
+													<input id="aud_task" type="text"/>
+													<button type="button" class="btn" value="#aud_task"><i class="icon-remove"></i></button>
 												</div>
 											</div>
 										</div>
 									</div>
 									<div class="modal-footer">
-										<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
-										<button class="btn btn-primary">Додати</button>
+										<div class="modal_message">
+											<p><b></b></p>
+										</div>
+										<div class="modal_buttons">
+											<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
+											<button class="btn btn-primary">Додати</button>
+										</div>
 									</div>
 								</div>
 							</div>

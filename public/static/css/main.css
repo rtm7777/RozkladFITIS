@@ -116,6 +116,24 @@
 	margin-top: 10px;
 }
 
+
+/*Модальне вікно додавання завдань кафедри*/
+#tab4 .btn-group {
+	margin-top: 0;
+}
+
+#tab4 .modal_cont2 .input-append {
+	margin-top: 5px;
+	margin-bottom: 60px;
+
+}
+
+#task-btn-group1 {
+	margin-bottom: 5px;
+}
+
+
+
 #groups-popover {
 	margin: 0 5px;
 }
@@ -353,5 +371,4 @@ body > .alert {
 .mov_elem div {
 	float: right;
 	margin: 2px 15px;
-} 15px;
 }

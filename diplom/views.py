@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule
+from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule, PairPeriod
 from django.utils import simplejson
 from django.contrib import auth
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
@@ -159,3 +159,54 @@ def experimental(request):
 
 def forum(request):
 	return render_to_response('forum.html')
+
+
+def initializebase(request):
+	pair_types = ["непарна", "парна", "кожен"]
+
+	for pty in pair_types:
+		p1 = PairType(type_of_pair = pty)
+		p1.save()
+
+	pair_periods = [1, 2, 3, 4]
+
+	for pper in pair_periods:
+		p1 = PairPeriod(period = pper)
+		p1.save()
+
+	pair_type = PairType.objects.all()
+	pair_period = PairPeriod.objects.all()
+
+	pair_numbers = ["I", "II", "III", "IV", "V", "VI"]
+
+	for pt in pair_type:
+		for pn in pair_numbers:
+			for pp in pair_period:
+				p1 = Pair(pair_type = pt,
+					pair_number = pn,
+					pair_period = pp)
+				p1.save()
+
+	subjectstypes = ["Практика", "Лабораторна", "Лекція", "Загальна"]
+
+	for st in subjectstypes:
+		p1 = SubjectsType(type_of_subject = st)
+		p1.save()
+
+	houses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+	for h in houses:
+		p1 = Housing(number_of_housing = h)
+		p1.save()
+
+	audiencestypes = ["Лабораторна", "Лекційна", "Загальна"]
+
+	for at in audiencestypes:
+		p1 = AudienceType(type_of_audience = at)
+		p1.save()
+
+	days = [u'1Понеділок', u'2Вівторок', u'3Середа', u'4Четвер', u"5П'ятниця"]
+
+	for d in days:
+		p1 = Day(day = d)
+		p1.save()

@@ -122,6 +122,16 @@ class Day(models.Model):
 		verbose_name = u'День'
 		verbose_name_plural = u'Дні'
 
+class Department(models.Model):
+	department_name = models.CharField(max_length=15, verbose_name=u"ім'я")
+	department_full_name = models.CharField(max_length=40, verbose_name=u"повне ім'я")
+
+	def __unicode__(self):
+		return self.department_name
+
+	class Meta:
+		verbose_name = u"кафедра"
+		verbose_name_plural = u"кафедри"
 
 class Schedule(models.Model):
 	group = models.ForeignKey(Group, verbose_name=u'група')
@@ -132,3 +142,10 @@ class Schedule(models.Model):
 	pair = models.ForeignKey(Pair, verbose_name=u'пара')
 	
 
+class TaskChair(models.Model):
+	department = models.ForeignKey(Department, verbose_name=u'кафедра')
+	subject = models.ForeignKey(Subject, verbose_name=u'предмет')
+	group = models.ForeignKey(Group, verbose_name=u'група')
+	teacher = models.ForeignKey(Teacher, verbose_name=u'викладач')
+	audience = models.ForeignKey(Audience, blank=True, verbose_name=u'аудиторія')
+	duration = models.DecimalField(max_digits=3, decimal_places=1, verbose_name=u'час')

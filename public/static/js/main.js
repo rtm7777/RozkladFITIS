@@ -29,53 +29,70 @@ $.ajaxSetup({    // Установка X-CSRFToken заголовку в Ajax з
 
 ////////// AJAX SECTION //////////
 $(function() {  // Ajax для автозаповнення предмету
-  $("#msub1, #msub2, #ssub1, #ssub2").typeahead({
+  $("#msub1, #msub2, #ssub1, #ssub2, #sub_task").typeahead({
     source: function(query, process) {
       $.ajax({
         url: "/ac",
         dataType: "jsonp",
-        data: {query: query},
+        data: {str: query},
         success: function(data) {
           process($.map(data.sources, function(item) {
             return item.name+' - '+item.type;
           }));
         }
       });
-    },
+    }
   });
 });
 
 $(function() {  // Ajax для автозаповнення викладача
-  $("#mteach1, #mteach2, #steach1, #steach2").typeahead({
+  $("#mteach1, #mteach2, #steach1, #steach2, #teach_task").typeahead({
     source: function(query, process) {
       $.ajax({
         url: "/tch",
         dataType: "jsonp",
-        data: {query: query},
+        data: {str: query},
         success: function(data) {
           process($.map(data.sources, function(item) {
             return item.lastname+' '+item.firstname+' '+item.middlename;
           }));
         }
       });
-    },
+    }
   });
 });
 
 $(function() {  // Ajax для автозаповнення аудиторії
-  $("#maud1, #saud1, #maud2, #saud2").typeahead({
+  $("#maud1, #saud1, #maud2, #saud2, #aud_task").typeahead({
     source: function(query, process) {
       $.ajax({
         url: "/au",
         dataType: "jsonp",
-        data: {query: query},
+        data: {str: query},
         success: function(data) {
           process($.map(data.sources, function(item) {
             return item.number;
           }));
         }
       });
-    },
+    }
+  });
+});
+
+$(function() {  // Ajax для автозаповнення групи
+  $("#group_task").typeahead({
+    source: function(query, process) {
+      $.ajax({
+        url: "/gr",
+        dataType: "jsonp",
+        data: {str: query},
+        success: function(data) {
+          process($.map(data.sources, function(item) {
+            return item.name;
+          }));
+        }
+      });
+    }
   });
 });
 

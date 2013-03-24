@@ -53,7 +53,7 @@ def rozklad_admin(request):
 def predmet_autocomplite(request):
 	subjects = Subject.objects.all()
 	
-	query = request.GET.get("predmet", "")
+	query = request.GET.get("str")
 	jquery = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
 		result = {}
@@ -81,7 +81,7 @@ def predmet_autocomplite(request):
 def teacher_autocomplite(request):
 	teachers = Teacher.objects.all()
 	
-	query = request.GET.get("teacher", "")
+	query = request.GET.get("str")
 	jquery = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
 		result = {}
@@ -111,7 +111,7 @@ def teacher_autocomplite(request):
 def audience_autocomplite(request):
 	audiences = Audience.objects.all()
 	
-	query = request.GET.get("auditory", "")
+	query = request.GET.get("str")
 
 	jquery = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
@@ -131,6 +131,33 @@ def audience_autocomplite(request):
 				aud = {}
 				aud['number'] = audience.number_of_audience + " - " + str(audience.housing.number_of_housing)
 				res.append(aud)
+		result['sources'] = res
+		json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def group_autocomplite(request):
+	groups = Group.objects.all()
+	
+	query = request.GET.get("str")
+
+	jquery = request.GET.get("callback")
+	if len(query) == 0 or query[0] == " ":
+		result = {}
+		res = []
+		for group in groups:
+			gr = {}
+			gr['name'] = group.group_name
+			res.append(gr)
+		result['sources'] = res
+		json = jquery+'('+simplejson.dumps(result)+')'
+	else:
+		result = {}
+		res = []
+		for group in groups:
+			if group.group_name.lower().find(query.lower()) != -1:
+				gr = {}
+				gr['name'] = group.group_name
+				res.append(gr)
 		result['sources'] = res
 		json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
