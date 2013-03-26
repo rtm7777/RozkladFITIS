@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule
+from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule, Department, TaskChair
 from django.utils import simplejson
 from django.contrib import auth
 
@@ -42,13 +42,17 @@ def rozklad_admin(request):
 	pairs = pair_in_day
 	groups = Group.objects.order_by("group_name")
 	houses = Housing.objects.all()
+	departments = Department.objects.all()
 	groups_list = []
 	houses_list = []
+	dep_list = []
 	for g in groups:
 		groups_list.append(g.group_name)
 	for h in houses:
 		houses_list.append(str(h.number_of_housing))
-	return render_to_response('rozklad_admin.html', {'days': days, 'pairs': pairs, 'groups': groups_list, 'houses': houses_list})
+	for d in departments:
+		dep_list.append(d.department_name)
+	return render_to_response('rozklad_admin.html', {'days': days, 'pairs': pairs, 'groups': groups_list, 'houses': houses_list, 'departments': dep_list})
 
 def predmet_autocomplite(request):
 	subjects = Subject.objects.all()
@@ -675,5 +679,90 @@ def getteachemp(request):
 	result['teachers'] = res
 
 	result['status'] = "ok"
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def getdeptasks(request):
+	dep = request.GET.get("dep")
+	jquery = request.GET.get("callback")
+
+	tasks = TaskChair.objects.filter(department__department_name=dep)
+
+	result = {}
+	res = []
+
+	for task in tasks:
+		items ={}
+		items["subject"] = task.subject.subject_name
+		items["group"] = task.group.group_name
+		items["time"] = str(task.duration)
+		items["teacher"] = task.teacher.teacher_last_name + " " + task.teacher.teacher_first_name + " " + task.teacher.teacher_middle_name
+		try:
+			items["audience"] = task.audience.number_of_audience
+		except:
+			items["audience"] = "-"
+		res.append(items)
+	result["tasks"] = res
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def adddeptask(request):
+	department = request.GET.get("department")
+	subject = request.GET.get("subject")
+	if subject:
+		subject_split = subject.split(" - ")
+	group = request.GET.get("group")
+	teacher = request.GET.get("teacher").split(" ")
+	audience = request.GET.get("audience")
+	audience_split = audience.split(" - ")
+	duration = request.GET.get("duration")
+	jquery = request.GET.get("callback")
+
+	result = {}
+	e = False
+
+	def check_errors():
+		e = False
+		items = {}
+		try:
+			items["subject"] = Subject.objects.get(subject_name = subject_split[0], subject_type__type_of_subject = subject_split[1])
+		except:
+			e = True
+		try:
+			items["teacher"] = Teacher.objects.get(teacher_last_name = teacher[0], teacher_first_name = teacher[1], teacher_middle_name = teacher[2])
+		except:
+			e = True
+		if audience != "":
+			try:
+				items["audience"] = Audience.objects.get(number_of_audience = audience_split[0], housing__number_of_housing = audience_split[1])	
+			except:
+				e = True
+		else:
+			items["audience"] = None
+		try:
+			items["department"] = Department.objects.get(department_name = department)
+		except:
+			e = True
+		try:
+			items["group"] = Group.objects.get(group_name = group)
+		except:
+			e = True
+
+		return e, items
+
+	def save_task(dep, sub, gr, teach, aud, dur):
+		t = TaskChair(department = dep,
+					subject = sub,
+					group = gr,
+					teacher = teach,
+					audience = aud,
+					duration = dur)
+		t.save()
+	if department != "":
+		e, items = check_errors()
+		if not e:
+			save_task(items['department'], items['subject'], items['group'], items['teacher'], items['audience'], duration)
+
+	result['errors'] = e
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')

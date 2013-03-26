@@ -20,6 +20,8 @@ urlpatterns = patterns('',
 	(r'dnd$', 'rozklad.views.dnd'), #відправка запиту при перетягуванні заняття
 	(r'getaudemp$', 'rozklad.views.getaudemp'), #зайнятість аудиторій
 	(r'getteachemp$', 'rozklad.views.getteachemp'), #зайнятість викладачів
+	(r'getdeptasks$', 'rozklad.views.getdeptasks'), #завдання кафедр
+	(r'adddeptask$', 'rozklad.views.adddeptask'), #додавання завдання кафедр
 
 	(r'login$', 'diplom.views.ajax_login'),
 	(r'^logout/$', logout, {'template_name': 'login.html'}),

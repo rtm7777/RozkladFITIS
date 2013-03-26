@@ -388,6 +388,62 @@ function GetTeachEmployment(day) {
   });
 };
 
+function GetDepTasks(dep) {
+  $.ajax({
+    url: "/getdeptasks",
+    dataType: "jsonp",
+    data: {
+      dep: dep
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      $("#tab4 table tbody").html(" ");
+      $.map(data.tasks, function(item) {
+        $("#tab4 table tbody").append("<tr><td><p>"+item.subject+"</p></td><td><p>"+item.group+"</p></td><td><p>"+item.time+"</p></td><td><p>"+item.teacher+"</p></td><td><p>"+item.audience+"</p></td></tr>");
+      });
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
+
+function AddDepTask() {
+  $.ajax({
+    url: "/adddeptask",
+    dataType: "jsonp",
+    data: {
+      department: $("#tab4_dep").val(),
+      subject: $("#sub_task").val(),
+      group: $("#group_task").val(),
+      teacher: $("#teach_task").val(),
+      audience: $("#aud_task").val(),
+      duration: $("#task-btn-group1 button.active").val()
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      if (data.errors) {
+        ShowModalMessage("#add_task_modal", "деякі поля введено некоректно");
+        $("#load_animation").hide("fast");
+      } else {
+        GetDepTasks($("#tab4_dep").val());
+        $("#add_task_modal").modal('hide');
+        $("#load_animation").hide("fast");
+      };
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
+
 $(function() { // Функція для входу користувача (Ajax)
   $("#send_login").click(function() {
     $.ajax({
@@ -468,6 +524,16 @@ $(function() {
     } else {
       ShowModalMessage("#add_stream_modal", "Заповніть всі поля");
     };
+  });
+});
+
+$(function() {
+  $("#add_dep_task").click(function(){
+  if ($("#sub_task").val() == "" || $("#group_task").val() == "" || $("#teach_task").val() == "") {
+    ShowModalMessage("#add_task_modal", "Заповніть всі поля");
+  } else {
+    AddDepTask();
+  };
   });
 });
 
@@ -601,6 +667,13 @@ $(document).ready(function() {
     } else{
       ShowMessage("error", "Виберіть корпус");
     };
+  });
+
+  $("#dep_id li a").click(function() {  // Відображення завдань кафедри
+    var dep = $(this);
+    $("#tab4_dep").prop({value: dep.attr("value")});
+    $("#dep_num").text("кафедра - " + dep.attr("value"));
+    GetDepTasks($("#tab4_dep").val())
   });
 
   $("a[href='#tab2']").click(function() { // Оновлення при виборі вкладки

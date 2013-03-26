@@ -147,5 +147,5 @@ class TaskChair(models.Model):
 	subject = models.ForeignKey(Subject, verbose_name=u'предмет')
 	group = models.ForeignKey(Group, verbose_name=u'група')
 	teacher = models.ForeignKey(Teacher, verbose_name=u'викладач')
-	audience = models.ForeignKey(Audience, blank=True, verbose_name=u'аудиторія')
+	audience = models.ForeignKey(Audience, blank=True, null=True, verbose_name=u'аудиторія')
 	duration = models.DecimalField(max_digits=3, decimal_places=1, verbose_name=u'час')

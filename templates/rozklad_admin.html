@@ -56,6 +56,14 @@
 					<div id="opt_task" class=" opt_hide">
 						<ul class="nav nav-list well">
 							<li class="nav-header">Опції</li>
+							<li class="dropdown-submenu">
+								<a id="dep_num" tabindex="-1" href="#">кафедра</a>
+								<ul id="dep_id" class="dropdown-menu">
+									{%for dep in departments%}
+										<li><a href="#" value="{{dep}}">кафедра - {{dep}}</a></li>
+									{%endfor%}
+								</ul>
+							</li>
 							<li><a href="#add_task_modal" data-toggle="modal">додати</a></li>
 							<li class="divider"></li>
 							<li class="nav-header">Додатково</li>
@@ -404,7 +412,7 @@
 								<table class="table table-bordered table-hover">
 									<thead>
 										<tr>
-											<th class="group_pair">Аудиторія / Пара</th>
+											<th>Аудиторія / Пара</th>
 											{%for pair in pairs%}
 											<th colspan="2">{{pair}}</th>
 											{%endfor%}
@@ -428,7 +436,7 @@
 								<table class="table table-bordered table-hover">
 									<thead>
 										<tr>
-											<th class="group_pair">Викладач / Пара</th>
+											<th>Викладач / Пара</th>
 											{%for pair in pairs%}
 											<th colspan="2">{{pair}}</th>
 											{%endfor%}
@@ -440,7 +448,21 @@
 								</table>
 							</div>
 							<div id="tab4" class="tab-pane fade">
-								<p>просмотр</p>
+								<input id="tab4_dep" type="text">
+								<table class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th>Предмет</th>
+											<th>Група</th>
+											<th>Час</th>
+											<th>Викладач</th>
+											<th>Аудиторія</th>
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>
 								<div id="add_task_modal" class="modal hide fade">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -468,7 +490,7 @@
 											<div class="modal_cont2">
 												<div>
 													<p>Годин на тиждень: </p>
-													<div class="btn-group" id="task-btn-group2" data-toggle="buttons-radio">
+													<div class="btn-group" id="task-btn-group1" data-toggle="buttons-radio">
 														<button type="button" class="btn" title="0.5 годин на тиждень" value="0.5">0.5</button>
 														<button type="button" class="btn active" title="1 година на тиждень" value="1">1</button>
 														<button type="button" class="btn" title="1.5 години на тиждень" value="1.5">1.5</button>
@@ -489,7 +511,7 @@
 										</div>
 										<div class="modal_buttons">
 											<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
-											<button class="btn btn-primary">Додати</button>
+											<button id="add_dep_task" class="btn btn-primary">Додати</button>
 										</div>
 									</div>
 								</div>
