@@ -693,7 +693,7 @@ def getdeptasks(request):
 
 	for task in tasks:
 		items ={}
-		items["subject"] = task.subject.subject_name
+		items["subject"] = task.subject.subject_name + " - " + task.subject.subject_type.type_of_subject
 		items["group"] = task.group.group_name
 		items["time"] = str(task.duration)
 		items["teacher"] = task.teacher.teacher_last_name + " " + task.teacher.teacher_first_name + " " + task.teacher.teacher_middle_name
@@ -764,5 +764,49 @@ def adddeptask(request):
 			save_task(items['department'], items['subject'], items['group'], items['teacher'], items['audience'], duration)
 
 	result['errors'] = e
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def getconformity(request):
+	group = request.GET.get("group")
+	jquery = request.GET.get("callback")
+
+	result = {}
+	res = []
+
+	tasks = TaskChair.objects.filter(group__group_name = group)
+
+
+	def getvalue(sub_name, sub_type, duration):
+		time = 0.0
+		lessons = Schedule.objects.filter(group__group_name = group, subject__subject_name = sub_name, subject__subject_type__type_of_subject = sub_type)
+		for lesson in lessons:
+			if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
+				if lesson.pair.pair_period.period == 1:
+					time += 2
+				else:
+					time += 0.5
+			else:
+				if lesson.pair.pair_period.period == 1:
+					time += 1
+				else:
+					time += 0.5
+		value = (100.0*time)/float(duration)
+
+		return value, time
+
+	for task in tasks:
+		items = {}
+		value, time = getvalue(task.subject.subject_name, task.subject.subject_type.type_of_subject, task.duration)
+		items["subject"] = task.subject.subject_name + " - " + task.subject.subject_type.type_of_subject + ": [" + str(time) + "/" + str(task.duration) + "]"
+		items["value"] = value
+		if value < 100:
+			items["type"] = ""
+		elif value == 100:
+			items["type"] = "progress-success"
+		elif value > 100:
+			items["type"] = "progress-danger"
+		res.append(items)
+	result['sources'] = res
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')

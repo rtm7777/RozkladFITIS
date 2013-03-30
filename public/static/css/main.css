@@ -213,6 +213,19 @@ tr:hover:nth-child(6n-5) td:first-child {
 	display: none;
 }
 
+#opt_rozklad div p:first-child {
+	margin: 10px 0 5px 0;
+	text-align: center;
+}
+
+#opt_rozklad div p {
+	margin: 0 0 5px;
+}
+
+#opt_rozklad div .progress {
+	margin-bottom: 10px;
+}
+
 /*Меню вибору групи при пререгляді розкладу*/
 .nav_tab_group li a {
 	padding-top: 2px;

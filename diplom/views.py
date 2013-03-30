@@ -210,3 +210,10 @@ def initializebase(request):
 	for d in days:
 		p1 = Day(day = d)
 		p1.save()
+
+	teachers = [u'Данилюк Андрій Андрійович', u'Сєркова Любов Едуардівна', u'Триус Юрій Васильович', u"Стеценко Інна В'ячеславівна", u'Саух Валерій Михайлович', u'Тимченко Анатолій Анастасійович']
+
+	for t in teachers:
+		t_s = t.split(" ")
+		p1 = Teacher(teacher_last_name = t_s[0], teacher_first_name = t_s[1], teacher_middle_name = t_s[2])
+		p1.save()

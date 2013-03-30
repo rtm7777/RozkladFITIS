@@ -150,6 +150,7 @@ function SendSubjectData(lining) {  // Відправка Ajax на сервер
             $("#load_animation").hide("fast");
           }
         });
+        GetConformity($("#group").val());
         $("#subject_add_modal").modal('hide');
         $("#load_animation").hide("fast");
         ShowMessage("success", "dodano");
@@ -223,7 +224,7 @@ function GetSubjects(group_val, message) {  // Отримання JSON заня�
     },
     success: function(data) {
       var dnd_html = $(".dnd_live").html();
-      $("tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>'+dnd_html);
+      $("#tab1 tr td:last-child").removeClass("single_admin").html('<p class="null"></p><hr><p class="null"></p>'+dnd_html);
       $.map(data.sources, function(item) {
         if (item.tupe == "кожен") {
           $('#'+item.daypair+' .subject_content').html('<p class="single_sub">'+item.subject+'</p>'+dnd_html);
@@ -412,6 +413,30 @@ function GetDepTasks(dep) {
   });
 };
 
+function GetConformity(group) {
+  $.ajax({
+    url: "/getconformity",
+    dataType: "jsonp",
+    data: {
+      group: group
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      $("#opt_rozklad div").html("<p><b>Відповідність завданню:</b></p>");
+      $.map(data.sources, function(item) {
+        $("#opt_rozklad>div").append('<p>'+item.subject+'</p><div class="progress '+item.type+'"><div class="bar" style="width: '+item.value+'%"></div></div>')
+        });
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
+
 function AddDepTask() {
   $.ajax({
     url: "/adddeptask",
@@ -442,6 +467,26 @@ function AddDepTask() {
       $("#load_animation").hide("fast");
     }
   });
+};
+
+function DeleteSubject(elem) {
+  $.ajax({
+    url: "/delsub",
+    dataType: "jsonp",
+    data: {
+      para: elem.attr("customdata")
+    },
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function() {
+      GetSubjects($("#group").val(), false);
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  })
 };
 
 $(function() { // Функція для входу користувача (Ajax)
@@ -629,6 +674,11 @@ $(document).ready(function() {
     SingleModalWindow($(this).parents("tr"));
   });
 
+  $(document).on('click', ".mov_elem div button:last-child", function() {
+    
+    DeleteSubject($(this).parents("tr"), "sub");
+  });
+
   $(function () {  //функція для прокрутки сторінки вгору
       $(window).scroll(function () {
           if ($(this).scrollTop() > 110)
@@ -651,6 +701,7 @@ $(document).ready(function() {
     $("#group").prop({value: group.attr("value")});
     $("#group_name").text("Група - " + group.attr("value"));
     GetSubjects(group.attr("value"), true);
+    GetConformity(group.attr("value"));
   });
 
   $("#house_id li a").click(function() {  // Відображення зайнятості аудиторій - корпус
@@ -726,7 +777,7 @@ $(document).ready(function() {
 
   $("#myTab li a").click(function() {
     var tab = $(this);
-    $("#rozklad_span3 div").slideUp("slow");
+    $("#rozklad_span3>div").slideUp("slow");
     $("#"+tab.attr("value")).slideDown("slow");
   });
 
