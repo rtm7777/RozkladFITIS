@@ -160,7 +160,7 @@ function SendSubjectData(lining) {  // Відправка Ajax на сервер
           ShowModalMessageAdv("#subject_add_modal", "Можлива накладка");
         } else {
           $("#load_animation").hide("fast");
-          ShowModalMessage("#subject_add_modal", data.lin_mes);
+          ShowModalMessage("#subject_add_modal", data.errors_message);
         };
       };
     },
@@ -197,6 +197,7 @@ function SendStreamSubjectData() { // Відправка Ajax на сервер 
         if ($("#group").val() !== "") {
           GetSubjects($("#group").val(), false)
         };
+        GetConformity($("#group").val());
         $("#add_stream_modal").modal('hide');
         $("#load_animation").hide("fast");
         ShowMessage("success", "dodano");
@@ -458,6 +459,9 @@ function AddDepTask() {
         $("#load_animation").hide("fast");
       } else {
         GetDepTasks($("#tab4_dep").val());
+        if ($("#group").val() !== "") {
+          GetConformity($("#group").val());
+        };
         $("#add_task_modal").modal('hide');
         $("#load_animation").hide("fast");
       };
@@ -469,18 +473,21 @@ function AddDepTask() {
   });
 };
 
-function DeleteSubject(elem) {
+function DeleteSubject(pair, group) {
   $.ajax({
     url: "/delsub",
     dataType: "jsonp",
     data: {
-      para: elem.attr("customdata")
+      group: group,
+      pair: pair
     },
     beforeSend: function() {
       $("#load_animation").show("fast");
     },
     success: function() {
       GetSubjects($("#group").val(), false);
+      GetConformity($("#group").val());
+      $("#dialog_modal").modal("hide");
     },
     error: function() {
       ShowMessage("error", "Виникла помилка");
@@ -582,6 +589,12 @@ $(function() {
   });
 });
 
+$(function() {
+  $("#dialog_yes").click(function(){
+    DeleteSubject($("#dm_param").val(), $("#group").val());
+  });
+});
+
 $(function() { //Очистка полів введення у вікні додавання заняття
   $(".modal_container div div button").click(function() {
     var button = $(this).val();
@@ -626,6 +639,10 @@ function ClearSubModal() {  //Очистка модального вікна
   $("#subject_add_modal .modal_container div div input").val('');
   $("#subject_add_modal .modal_container div .btn-group button").removeClass("active");
   $("#subject_add_modal .modal_container div .btn-group button:first-child").addClass("active");
+  $(".modal_container .modal_cont1 div button[value='2']").prop({disabled: true});
+  $(".modal_container .modal_cont1 div button[value='4']").prop({disabled: true});
+  $(".modal_container .modal_cont2 div button[value='3']").prop({disabled: true});
+  $(".modal_container .modal_cont2 div button[value='5']").prop({disabled: true});
 };
 
 function SetPeriodActive(evenodd, period) { //Установка кнопки періоду
@@ -638,11 +655,14 @@ function SetPeriodActive(evenodd, period) { //Установка кнопки п
   };
 };
 
-function DisableModalEven(property) {
+function DisableModalEven(property) {  //Блокування лівої частини діалогового вікна
   $("#msub1, #ssub1").prop({disabled: property});
   $("#mteach1, #steach1").prop({disabled: property});
   $("#maud1, #saud1").prop({disabled: property});
-  $(".modal_container .modal_cont1 div button").prop({disabled: property});
+  $(".modal_container .modal_cont1 div button[value^='#']").prop({disabled: property});
+  $(".modal_container .modal_cont1 div button[value='1']").prop({disabled: property});
+  $(".modal_container .modal_cont1 div button[value='3']").prop({disabled: property});
+  $(".modal_container .modal_cont1 div button[value='5']").prop({disabled: property});
   if (property) {
     $(".modal_container .modal_cont1 div label").addClass("label_disabled");
   } else{
@@ -654,7 +674,10 @@ function DisableModalOdd(property) {  //Блокування правої час
   $("#msub2, #ssub2").prop({disabled: property});
   $("#mteach2, #steach2").prop({disabled: property});
   $("#maud2, #saud2").prop({disabled: property});
-  $(".modal_container .modal_cont2 div button").prop({disabled: property});
+  $(".modal_container .modal_cont2 div button[value^='#']").prop({disabled: property});
+  $(".modal_container .modal_cont2 div button[value='1']").prop({disabled: property});
+  $(".modal_container .modal_cont2 div button[value='2']").prop({disabled: property});
+  $(".modal_container .modal_cont2 div button[value='4']").prop({disabled: property});
   if (property) {
     $(".modal_container .modal_cont2 div label").addClass("label_disabled");
   } else{
@@ -675,8 +698,9 @@ $(document).ready(function() {
   });
 
   $(document).on('click', ".mov_elem div button:last-child", function() {
-    
-    DeleteSubject($(this).parents("tr"), "sub");
+    pair = $(this).parents("tr").attr("id");
+    $("#dm_param").val(pair);
+    $("#dialog_modal").modal('show');
   });
 
   $(function () {  //функція для прокрутки сторінки вгору

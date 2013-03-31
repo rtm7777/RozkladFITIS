@@ -32,7 +32,7 @@ def ajax_login(request):
 			return HttpResponse(json, mimetype = 'application/json')
 
 def rozklad(request):
-	groups = Group.objects.order_by("group_name")
+	groups 		= Group.objects.order_by("group_name")
 	groups_list = []
 	for g in groups:
 		groups_list.append(g.group_name)
@@ -57,14 +57,16 @@ def rozklad_content(request, group):
 
 	schedules = Schedule.objects.filter(group__group_name = group)
 	for schedule in schedules:
-		if schedule.pair.pair_period.period == 1:
+		if schedule.pair.pair_period.period   == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
 			period = "2,6,10,14"
 		elif schedule.pair.pair_period.period == 3:
 			period = "3,7,11,15"
-		elif schedule.pair.pair_period.period ==4:
+		elif schedule.pair.pair_period.period == 4:
 			period = "4,8,12,16"
+		elif schedule.pair.pair_period.period == 5:
+			period = "5,9,13,17"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
 		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing) + ' ' + period
 		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.'
@@ -115,14 +117,16 @@ def rt_content(request, teacher):
 
 	schedules = Schedule.objects.filter(teacher__teacher_last_name = tlfm[0], teacher__teacher_first_name = tlfm[1], teacher__teacher_middle_name = tlfm[2])
 	for schedule in schedules:
-		if schedule.pair.pair_period.period == 1:
+		if schedule.pair.pair_period.period   == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
 			period = "2,6,10,14"
 		elif schedule.pair.pair_period.period == 3:
 			period = "3,7,11,15"
-		elif schedule.pair.pair_period.period ==4:
+		elif schedule.pair.pair_period.period == 4:
 			period = "4,8,12,16"
+		elif schedule.pair.pair_period.period == 5:
+			period = "5,9,13,17"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
 		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing)
 		group = ' ' + schedule.group.group_name + ' ' + period
@@ -168,7 +172,7 @@ def initializebase(request):
 		p1 = PairType(type_of_pair = pty)
 		p1.save()
 
-	pair_periods = [1, 2, 3, 4]
+	pair_periods = [1, 2, 3, 4, 5]
 
 	for pper in pair_periods:
 		p1 = PairPeriod(period = pper)

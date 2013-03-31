@@ -10,21 +10,23 @@ days_in_week = [u'1Понеділок', u'2Вівторок', u'3Середа', 
 pair_in_day = ['I', 'II', 'III', 'IV', 'V', 'VI']
 
 def group_subjs(request):
-	group = request.GET.get("group")
-	jquery = request.GET.get("callback")
+	group     = request.GET.get("group")
+	jquery    = request.GET.get("callback")
 	schedules = Schedule.objects.filter(group__group_name = group)
-	result = {}
-	res = []
-	period = ""
+	result    = {}
+	res       = []
+	period    = ""
 	for schedule in schedules:
-		if schedule.pair.pair_period.period == 1:
+		if schedule.pair.pair_period.period   == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
 			period = "2,6,10,14"
 		elif schedule.pair.pair_period.period == 3:
 			period = "3,7,11,15"
-		elif schedule.pair.pair_period.period ==4:
+		elif schedule.pair.pair_period.period == 4:
 			period = "4,8,12,16"
+		elif schedule.pair.pair_period.period == 5:
+			period = "5,9,13,17"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
 		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing)
 		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.' + " " + period
@@ -38,14 +40,14 @@ def group_subjs(request):
 	return HttpResponse(json, mimetype = 'application/json')
 
 def rozklad_admin(request):
-	days = days_in_week
-	pairs = pair_in_day
-	groups = Group.objects.order_by("group_name")
-	houses = Housing.objects.all()
+	days 		= days_in_week
+	pairs 		= pair_in_day
+	groups 		= Group.objects.order_by("group_name")
+	houses 		= Housing.objects.all()
 	departments = Department.objects.all()
 	groups_list = []
 	houses_list = []
-	dep_list = []
+	dep_list 	= []
 	for g in groups:
 		groups_list.append(g.group_name)
 	for h in houses:
@@ -56,14 +58,13 @@ def rozklad_admin(request):
 
 def predmet_autocomplite(request):
 	subjects = Subject.objects.all()
-	
-	query = request.GET.get("str")
-	jquery = request.GET.get("callback")
+	query    = request.GET.get("str")
+	jquery   = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
-		result = {}
-		res = []
+		result 	= {}
+		res 	= []
 		for subject in subjects:
-			subj = {}
+			subj 		 = {}
 			subj['name'] = subject.subject_name
 			subj['type'] = subject.subject_type.type_of_subject
 			res.append(subj)
@@ -74,7 +75,7 @@ def predmet_autocomplite(request):
 		res = []
 		for subject in subjects:
 			if subject.subject_name.lower().find(query.lower()) != -1:
-				subj = {}
+				subj 		 = {}
 				subj['name'] = subject.subject_name
 				subj['type'] = subject.subject_type.type_of_subject
 				res.append(subj)
@@ -84,28 +85,27 @@ def predmet_autocomplite(request):
 
 def teacher_autocomplite(request):
 	teachers = Teacher.objects.all()
-	
-	query = request.GET.get("str")
-	jquery = request.GET.get("callback")
+	query    = request.GET.get("str")
+	jquery   = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
 		result = {}
-		res = []
+		res    = []
 		for teacher in teachers:
 			teach = {}
-			teach['firstname'] = teacher.teacher_first_name
-			teach['lastname'] = teacher.teacher_last_name
+			teach['firstname']  = teacher.teacher_first_name
+			teach['lastname']   = teacher.teacher_last_name
 			teach['middlename'] = teacher.teacher_middle_name
 			res.append(teach)
 		result['sources'] = res
 		json = jquery+'('+simplejson.dumps(result)+')'
 	else:
 		result = {}
-		res = []
+		res    = []
 		for teacher in teachers:
 			if teacher.teacher_last_name.lower().find(query.lower()) != -1:
 				teach = {}
-				teach['firstname'] = teacher.teacher_first_name
-				teach['lastname'] = teacher.teacher_last_name
+				teach['firstname']  = teacher.teacher_first_name
+				teach['lastname']   = teacher.teacher_last_name
 				teach['middlename'] = teacher.teacher_middle_name
 				res.append(teach)
 		result['sources'] = res
@@ -114,15 +114,13 @@ def teacher_autocomplite(request):
 
 def audience_autocomplite(request):
 	audiences = Audience.objects.all()
-	
-	query = request.GET.get("str")
-
-	jquery = request.GET.get("callback")
+	query     = request.GET.get("str")
+	jquery    = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
 		result = {}
-		res = []
+		res    = []
 		for audience in audiences:
-			aud = {}
+			aud 		  = {}
 			aud['number'] = audience.number_of_audience + " - " + str(audience.housing.number_of_housing)
 			res.append(aud)
 		result['sources'] = res
@@ -147,7 +145,7 @@ def group_autocomplite(request):
 	jquery = request.GET.get("callback")
 	if len(query) == 0 or query[0] == " ":
 		result = {}
-		res = []
+		res    = []
 		for group in groups:
 			gr = {}
 			gr['name'] = group.group_name
@@ -167,23 +165,22 @@ def group_autocomplite(request):
 	return HttpResponse(json, mimetype = 'application/json')
 
 def pair_add(request):
-	group_val = request.GET.get("group")
-	day_pair = request.GET.get("para").split(" ")
-	jquery = request.GET.get("callback")
-	day = day_pair[0]
-	pair = day_pair[1]
-	evenodd = request.GET.get("evenodd")
+	group_val 	 = request.GET.get("group")
+	day_pair 	 = request.GET.get("para").split(" ")
+	jquery 		 = request.GET.get("callback")
+	day 		 = day_pair[0]
+	pair 		 = day_pair[1]
+	evenodd      = request.GET.get("evenodd")
 	lining_check = request.GET.get("lining")
 
-	schedules = Schedule.objects.all()
+	schedules 	  = Schedule.objects.all()
 	pairs_objects = Pair.objects.filter(pair_number = pair)
 
-	pair_add.errors = ""
+	pair_add.errors 		= ""
 	pair_add.errors_message = "Некорректно введено:"
-	pair_add.lining = ""
-	pair_add.lin_count_t = 0
-	pair_add.lin_count_a = 0
-	pair_add.lin_mes = ""
+	pair_add.lining 		= ""
+	pair_add.lin_count_t 	= 0
+	pair_add.lin_count_a 	= 0
 
 	def delete_objects(objects):
 		for schedule in schedules:
@@ -193,12 +190,12 @@ def pair_add(request):
 					p1.delete()
 
 	def save_schedule(day, group, teacher, audience, subject, pair):
-		p1 = Schedule(day = day,
-					group = group,
-					teacher = teacher,
+		p1 = Schedule(day    = day,
+					group    = group,
+					teacher  = teacher,
 					audience = audience,
-					subject = subject,
-					pair = pair)
+					subject  = subject,
+					pair     = pair)
 		p1.save()
 
 	def full_save_schedule():
@@ -265,7 +262,6 @@ def pair_add(request):
 		if pair_add.lin_count_t != 0:
 			for lesson in lessons:
 				if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
-					pair_add.lin_mes = "eo-"
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
@@ -273,7 +269,6 @@ def pair_add(request):
 						pair_add.errors = "true"
 						pair_add.lining = "true"
 				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or "кожен":
-					pair_add.lin_mes = lesson.pair.pair_period.period
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
@@ -290,7 +285,6 @@ def pair_add(request):
 		if pair_add.lin_count_a != 0:
 			for lesson in lessons:
 				if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
-					pair_add.lin_mes = "eo-"
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
@@ -298,7 +292,6 @@ def pair_add(request):
 						pair_add.errors = "true"
 						pair_add.lining = "true"
 				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or "кожен":
-					pair_add.lin_mes = lesson.pair.pair_period.period
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
@@ -307,21 +300,21 @@ def pair_add(request):
 						pair_add.lining = "true"
 
 
-	subject1 = request.GET.get("subject1")
+	subject1 			= request.GET.get("subject1")
 	if subject1:
-		subject1_split = subject1.split(" - ")
-	teacher1 = request.GET.get("teacher1").split(" ")
-	audience1 = request.GET.get("audience1")
-	audience1_split = audience1.split(" - ")
-	period1 = request.GET.get("period1")
+		subject1_split  = subject1.split(" - ")
+	teacher1			= request.GET.get("teacher1").split(" ")
+	audience1 			= request.GET.get("audience1")
+	audience1_split 	= audience1.split(" - ")
+	period1 			= request.GET.get("period1")
 
-	subject2 = request.GET.get("subject2")
+	subject2 			= request.GET.get("subject2")
 	if subject2:
-		subject2_split = subject2.split(" - ")
-	teacher2 = request.GET.get("teacher2").split(" ")
-	audience2 = request.GET.get("audience2")
-	audience2_split = audience2.split(" - ")
-	period2 = request.GET.get("period2")
+		subject2_split  = subject2.split(" - ")
+	teacher2 			= request.GET.get("teacher2").split(" ")
+	audience2 			= request.GET.get("audience2")
+	audience2_split 	= audience2.split(" - ")
+	period2 			= request.GET.get("period2")
 
 	s_day = Day.objects.get(day=day)
 	s_group = Group.objects.get(group_name=group_val)
@@ -378,13 +371,12 @@ def pair_add(request):
 					full_save_schedule()
 		
 
-	result = {}
-	result['errors'] = pair_add.errors
+	result 					 = {}
+	result['errors'] 		 = pair_add.errors
 	result['errors_message'] = pair_add.errors_message[:-1]
-	result['lining'] = pair_add.lining
-	result['count'] = str(pair_add.lin_count_t) + " __ " + str(pair_add.lin_count_a)
-	result['lin_mes'] = pair_add.lin_mes
-	json = jquery+'('+simplejson.dumps(result)+')'
+	result['lining'] 		 = pair_add.lining
+	result['count'] 		 = str(pair_add.lin_count_t) + " __ " + str(pair_add.lin_count_a)
+	json 					 = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
 
 def pair_stream_add(request):
@@ -400,12 +392,12 @@ def pair_stream_add(request):
 	pair_add.errors_message = "Некорректно введено:"
 
 	def save_schedule(day, group, teacher, audience, subject, pair):
-		p1 = Schedule(day = day,
-					group = group,
-					teacher = teacher,
+		p1 = Schedule(day    = day,
+					group    = group,
+					teacher  = teacher,
 					audience = audience,
-					subject = subject,
-					pair = pair)
+					subject  = subject,
+					pair     = pair)
 		p1.save()
 
 	def full_save_schedule():
@@ -531,7 +523,7 @@ def getsubjsingle(request):
 	res = []
 	period = ""
 	for schedule in schedules:
-		if schedule.pair.pair_period.period == 1:
+		if schedule.pair.pair_period.period   == 1:
 			period = ""
 		elif schedule.pair.pair_period.period == 2:
 			period = "2,6,10,14"
@@ -539,6 +531,8 @@ def getsubjsingle(request):
 			period = "3,7,11,15"
 		elif schedule.pair.pair_period.period == 4:
 			period = "4,8,12,16"
+		elif schedule.pair.pair_period.period == 5:
+			period = "5,9,13,17"
 		subject = schedule.subject.subject_name + ' - ' + schedule.subject.subject_type.type_of_subject
 		audience = ' a.' + schedule.audience.number_of_audience + '-' + str(schedule.audience.housing.number_of_housing)
 		teacher = ' ' + schedule.teacher.teacher_last_name + ' ' + schedule.teacher.teacher_first_name[0] + '.' + schedule.teacher.teacher_middle_name[0] + '.' + ' ' + period
@@ -553,33 +547,33 @@ def getsubjsingle(request):
 
 def getsubjsmodal(request):
 	group_val = request.GET.get("group")
-	day_pair = request.GET.get("para").split(" ")
-	jquery = request.GET.get("callback")
-	day = day_pair[0]
-	pair = day_pair[1]
-	result = {}
-	res = []
+	day_pair  = request.GET.get("para").split(" ")
+	jquery    = request.GET.get("callback")
+	day       = day_pair[0]
+	pair      = day_pair[1]
+	result    = {}
+	res       = []
 	
 	schedules = Schedule.objects.filter(group__group_name = group_val, day__day = day, pair__pair_number = pair)
 	for schedule in schedules:
 		sub = {}
-		sub["subject"] = schedule.subject.subject_name + " - " + schedule.subject.subject_type.type_of_subject
-		sub["teacher"] = schedule.teacher.teacher_last_name + " " + schedule.teacher.teacher_first_name + " " + schedule.teacher.teacher_middle_name
-		sub["audience"] = str(schedule.audience.number_of_audience) + " - " + str(schedule.audience.housing.number_of_housing)
-		sub["period"] = schedule.pair.pair_period.period
+		sub["subject"]   = schedule.subject.subject_name + " - " + schedule.subject.subject_type.type_of_subject
+		sub["teacher"]   = schedule.teacher.teacher_last_name + " " + schedule.teacher.teacher_first_name + " " + schedule.teacher.teacher_middle_name
+		sub["audience"]  = str(schedule.audience.number_of_audience) + " - " + str(schedule.audience.housing.number_of_housing)
+		sub["period"]    = schedule.pair.pair_period.period
 		sub["pair_type"] = schedule.pair.pair_type.type_of_pair
-		sub["amount"] = "false"
+		sub["amount"]    = "false"
 		res.append(sub)
-	result['sources'] = res
+	result['sources']    = res
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
 
 def dnd(request):
-	group = request.GET.get("group")
+	group     = request.GET.get("group")
 	start_les = request.GET.get("from").split("_")
-	end_les = request.GET.get("to").split("_")
-	action = request.GET.get("action")
-	jquery = request.GET.get("callback")
+	end_les   = request.GET.get("to").split("_")
+	action    = request.GET.get("action")
+	jquery    = request.GET.get("callback")
 
 	les_start = Schedule.objects.filter(group__group_name = group, day__day__contains = start_les[0], pair__pair_number = start_les[1])
 	les_end = Schedule.objects.filter(group__group_name = group, day__day__contains = end_les[0], pair__pair_number = end_les[1])
@@ -593,28 +587,28 @@ def dnd(request):
 	if action == "swap":
 		for les in les_start:
 			les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
-				pair = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
-				group = les.group,
-				teacher = les.teacher,
+				pair     = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+				group    = les.group,
+				teacher  = les.teacher,
 				audience = les.audience, 
-				subject = les.subject)
+				subject  = les.subject)
 			les.save()
 		for les in les_end:
 			les = Schedule(day = Day.objects.get(day__contains=start_les[0]),
-				pair = Pair.objects.get(pair_number = start_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
-				group = les.group,
-				teacher = les.teacher,
+				pair     = Pair.objects.get(pair_number = start_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+				group    = les.group,
+				teacher  = les.teacher,
 				audience = les.audience, 
-				subject = les.subject)
+				subject  = les.subject)
 			les.save()
 	elif action == "replace":
 		for les in les_start:
 			les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
-				pair = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
-				group = les.group,
-				teacher = les.teacher,
+				pair     = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+				group    = les.group,
+				teacher  = les.teacher,
 				audience = les.audience, 
-				subject = les.subject)
+				subject  = les.subject)
 			les.save()
 
 	result = {}
@@ -639,9 +633,9 @@ def getaudemp(request):
 		aud['number'] = audience.number_of_audience
 		for schedule in schedules:
 			if audience == schedule.audience:
-				items = {}
-				items["num"] = schedule.pair.pair_number
-				items["type"] = schedule.pair.pair_type.type_of_pair
+				items           = {}
+				items["num"]    = schedule.pair.pair_number
+				items["type"]   = schedule.pair.pair_type.type_of_pair
 				items["period"] = str(schedule.pair.pair_period.period)
 				pairs.append(items)
 		aud["pairs"] = pairs
@@ -670,8 +664,8 @@ def getteachemp(request):
 		for schedule in schedules:
 			if teacher == schedule.teacher:
 				items = {}
-				items["num"] = schedule.pair.pair_number
-				items["type"] = schedule.pair.pair_type.type_of_pair
+				items["num"]    = schedule.pair.pair_number
+				items["type"]   = schedule.pair.pair_type.type_of_pair
 				items["period"] = str(schedule.pair.pair_period.period)
 				pairs.append(items)
 		teach["pairs"] = pairs
@@ -694,8 +688,8 @@ def getdeptasks(request):
 	for task in tasks:
 		items ={}
 		items["subject"] = task.subject.subject_name + " - " + task.subject.subject_type.type_of_subject
-		items["group"] = task.group.group_name
-		items["time"] = str(task.duration)
+		items["group"]   = task.group.group_name
+		items["time"]    = str(task.duration)
 		items["teacher"] = task.teacher.teacher_last_name + " " + task.teacher.teacher_first_name + " " + task.teacher.teacher_middle_name
 		try:
 			items["audience"] = task.audience.number_of_audience
@@ -708,15 +702,15 @@ def getdeptasks(request):
 
 def adddeptask(request):
 	department = request.GET.get("department")
-	subject = request.GET.get("subject")
+	subject    = request.GET.get("subject")
 	if subject:
 		subject_split = subject.split(" - ")
-	group = request.GET.get("group")
-	teacher = request.GET.get("teacher").split(" ")
-	audience = request.GET.get("audience")
+	group      = request.GET.get("group")
+	teacher    = request.GET.get("teacher").split(" ")
+	audience   = request.GET.get("audience")
 	audience_split = audience.split(" - ")
-	duration = request.GET.get("duration")
-	jquery = request.GET.get("callback")
+	duration   = request.GET.get("duration")
+	jquery     = request.GET.get("callback")
 
 	result = {}
 	e = False
@@ -752,11 +746,11 @@ def adddeptask(request):
 
 	def save_task(dep, sub, gr, teach, aud, dur):
 		t = TaskChair(department = dep,
-					subject = sub,
-					group = gr,
-					teacher = teach,
-					audience = aud,
-					duration = dur)
+					subject      = sub,
+					group        = gr,
+					teacher      = teach,
+					audience     = aud,
+					duration     = dur)
 		t.save()
 	if department != "":
 		e, items = check_errors()
@@ -808,5 +802,17 @@ def getconformity(request):
 			items["type"] = "progress-danger"
 		res.append(items)
 	result['sources'] = res
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def delsub(request):
+	group_val 	 = request.GET.get("group")
+	day_pair 	 = request.GET.get("pair").split("_")
+	jquery 		 = request.GET.get("callback")
+	subjects 	 = Schedule.objects.filter(group__group_name = group_val, day__day__contains = day_pair[0], pair__pair_number = day_pair[1])
+	for s in subjects:
+		s.delete()
+	result = {}
+	result['status'] = "ok"
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')

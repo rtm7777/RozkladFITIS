@@ -159,9 +159,10 @@
 												</div>
 												<div class="btn-group" id="btn-group1" data-toggle="buttons-radio">
 													<button type="button" class="btn btn-small active" title="Звичайна пара" value="1"><i class="icon-ok"></i></button>
-													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2" disabled>2</button>
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
-													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4" disabled>4</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 5-9-13-17 тижні" value="5">5</button>
 												</div>
 											</div>
 											<div class="modal_cont2">
@@ -183,8 +184,9 @@
 												<div class="btn-group" id="btn-group2" data-toggle="buttons-radio">
 													<button type="button" class="btn btn-small active" title="Звичайна пара" value="1"><i class="icon-ok"></i></button>
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
-													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3" disabled>3</button>
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 5-9-13-17 тижні" value="5" disabled>5</button>
 												</div>
 											</div>
 										</div>
@@ -288,6 +290,7 @@
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 5-9-13-17 тижні" value="5">5</button>
 												</div>
 											</div>
 											<div class="modal_cont2">
@@ -311,6 +314,7 @@
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 2-6-10-14 тижні" value="2">2</button>
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 3-7-11-15 тижні" value="3">3</button>
 													<button type="button" class="btn btn-small" title="Пара раз у місяць 4-8-12-16 тижні" value="4">4</button>
+													<button type="button" class="btn btn-small" title="Пара раз у місяць 5-9-13-17 тижні" value="5">5</button>
 												</div>
 											</div>
 										</div>
@@ -515,6 +519,25 @@
 											<button class="btn" data-dismiss="modal" aria-hidden="true">Відміна</button>
 											<button id="add_dep_task" class="btn btn-primary">Додати</button>
 										</div>
+									</div>
+								</div>
+							</div>
+							<div id="dialog_modal" class="modal hide fade">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									<h3>Видалити заняття</h3>
+								</div>
+								<div class="modal-body">
+									<input id="dm_param" type="text">
+									<p>Ви впевнені?</p>
+								</div>
+								<div class="modal-footer">
+									<div class="modal_message">
+										<p><b></b></p>
+									</div>
+									<div class="modal_buttons">
+										<button class="btn" data-dismiss="modal" aria-hidden="true">Ні</button>
+										<button id="dialog_yes" class="btn btn-primary">Так</button>
 									</div>
 								</div>
 							</div>

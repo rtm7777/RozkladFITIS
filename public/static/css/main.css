@@ -65,6 +65,10 @@
 	display: none;
 }
 
+#dm_param {
+	display: none;
+}
+
 /*Невидимі поля вкладок*/
 #tab2>input, #tab4>input {
 	display: none;
