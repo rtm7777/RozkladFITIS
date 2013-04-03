@@ -265,14 +265,14 @@ def pair_add(request):
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-					elif int(period) == lesson.pair.pair_period.period or 1:
+					elif int(period) == lesson.pair.pair_period.period or int(period) == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or "кожен":
+				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or eo == "кожен":
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-					elif int(period) == lesson.pair.pair_period.period or 1:
+					elif int(period) == lesson.pair.pair_period.period or int(period) == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
 
@@ -288,14 +288,14 @@ def pair_add(request):
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-					elif int(period) == lesson.pair.pair_period.period or 1:
+					elif int(period) == lesson.pair.pair_period.period or int(period) == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or "кожен":
+				elif eo == lesson.pair.pair_type.type_of_pair.encode("utf-8") or eo == "кожен":
 					if lesson.pair.pair_period.period == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
-					elif int(period) == lesson.pair.pair_period.period or 1:
+					elif int(period) == lesson.pair.pair_period.period or int(period) == 1:
 						pair_add.errors = "true"
 						pair_add.lining = "true"
 

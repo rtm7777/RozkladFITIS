@@ -319,24 +319,45 @@ function GetAudEmployment(house, day) {
     success: function(data) {
       $("#tab2 table tbody").html(" ");
       $.map(data.audiences, function(item) {
-        $("#tab2 table tbody").append("<tr class=" + item.number + "><th>" + item.number + "</th><th class='I1'><p></p></th><th class='I2'><p></p></th><th class='II1'><p></p></th><th class='II3'><p></p></th><th class='III1'><p></p></th><th class='III2'><p></p></th><th class='IV1'><p></p></th><th class='IV2'><p></p></th><th class='V1'><p></p></th><th class='V2'><p></p></th><th class='VI1'><p></p></th><th class='VI2'><p></p></th></tr>");
+        $("#tab2 table tbody").append("<tr class=" + item.number + "><th>" + item.number + "</th><th class='I1'><p></p></th><th class='I2'><p></p></th><th class='II1'><p></p></th><th class='II2'><p></p></th><th class='III1'><p></p></th><th class='III2'><p></p></th><th class='IV1'><p></p></th><th class='IV2'><p></p></th><th class='V1'><p></p></th><th class='V2'><p></p></th><th class='VI1'><p></p></th><th class='VI2'><p></p></th></tr>");
         $.map(item.pairs,  function(i) {
           var period_bool = false;
-          var periods = "";
           var type = 0;
+          var periods = "";
+          var periods_true = false;
           if (i.type == "непарна") {
             type = 1
           } else if (i.type == "парна") {
             type = 2
-          }else if (i.type == "кожен") {
+          } else if (i.type == "кожен") {
             period_bool = true;
           };
-          if (period_bool) {
-            $("#tab2 table tbody ." + item.number + " ." + i.num + "1").addClass("bysy_cell");
-            $("#tab2 table tbody ." + item.number + " ." + i.num + "2").addClass("bysy_cell");
+          if (i.period == "1") {
+            var periods_true = true;
           } else {
-            $("#tab2 table tbody ." + item.number + " ." + i.num + type).addClass("bysy_cell");
+            if (periods_true == false) {
+              periods += i.period + ","
+            };
           };
+          if (periods_true) {
+            if (period_bool) {
+              $("#tab2 table tbody ." + item.number + " ." + i.num + "1").addClass("bysy_cell");
+              $("#tab2 table tbody ." + item.number + " ." + i.num + "2").addClass("bysy_cell");
+            } else {
+              $("#tab2 table tbody ." + item.number + " ." + i.num + type).addClass("bysy_cell");
+            };
+          } else {
+            if (period_bool) {
+              $("#tab2 table tbody ." + item.number + " ." + i.num + "1").addClass("bysy_cell");
+              $("#tab2 table tbody ." + item.number + " ." + i.num + "1 p").text(periods.slice(0,-1));
+              $("#tab2 table tbody ." + item.number + " ." + i.num + "2").addClass("bysy_cell");
+              $("#tab2 table tbody ." + item.number + " ." + i.num + "2 p").text(periods.slice(0,-1));
+            } else {
+              $("#tab2 table tbody ." + item.number + " ." + i.num + type).addClass("bysy_cell");
+              $("#tab2 table tbody ." + item.number + " ." + i.num + type + " p").text(periods.slice(0,-1));
+            };
+          };
+          
         });
       });
       $("#load_animation").hide("fast");
