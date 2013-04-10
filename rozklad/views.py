@@ -578,41 +578,88 @@ def dnd(request):
 	les_start = Schedule.objects.filter(group__group_name = group, day__day__contains = start_les[0], pair__pair_number = start_les[1])
 	les_end = Schedule.objects.filter(group__group_name = group, day__day__contains = end_les[0], pair__pair_number = end_les[1])
 
-	for les in les_start:
-		les.delete()
 
+	linings_start = False
+	linings_end   = False
+
+	def lin_check(lessons, les):
+		lining = False
+		for lesson in lessons:
+			
+			if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
+				if lesson.pair.pair_period.period == 1:
+					lining = True
+				elif int(les.pair.pair_period.period) == lesson.pair.pair_period.period or int(les.pair.pair_period.period) == 1:
+					lining = True
+			elif les.pair.pair_type.type_of_pair.encode("utf-8") == lesson.pair.pair_type.type_of_pair.encode("utf-8") or les.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
+				if lesson.pair.pair_period.period == 1:
+					lining = True
+				elif int(les.pair.pair_period.period) == lesson.pair.pair_period.period or int(les.pair.pair_period.period) == 1:
+					lining = True
+			else:
+				lining = True
+		return lining
+
+	def get_lining_count(les, se_les):
+		lining = False
+		lessons_t = Schedule.objects.filter(day__day__contains=se_les[0], pair__pair_number = se_les[1], teacher__teacher_last_name = les.teacher.teacher_last_name, teacher__teacher_first_name = les.teacher.teacher_first_name, teacher__teacher_middle_name = les.teacher.teacher_middle_name)
+		lin_count_t = lessons_t.count()
+
+		if lin_count_t != 0:
+			lining = lin_check(lessons_t, les)
+
+		lessons_a = Schedule.objects.filter(day__day__contains=se_les[0], pair__pair_number = se_les[1], audience__number_of_audience = les.audience.number_of_audience, audience__housing__number_of_housing = les.audience.housing.number_of_housing)
+		lin_count_a = lessons_a.count()
+
+		if lin_count_a != 0:
+			if not lining:
+				lining = lin_check(lessons_a, les)
+
+		return lining
+
+
+	for les in les_start:
+		if not linings_start:
+			linings_start = get_lining_count(les, end_les)
+		
 	for les in les_end:
-		les.delete()
+		if not linings_end:
+			linings_end   = get_lining_count(les, start_les)
 
 	if action == "swap":
-		for les in les_start:
-			les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
-				pair     = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
-				group    = les.group,
-				teacher  = les.teacher,
-				audience = les.audience, 
-				subject  = les.subject)
-			les.save()
-		for les in les_end:
-			les = Schedule(day = Day.objects.get(day__contains=start_les[0]),
-				pair     = Pair.objects.get(pair_number = start_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
-				group    = les.group,
-				teacher  = les.teacher,
-				audience = les.audience, 
-				subject  = les.subject)
-			les.save()
+		if not linings_start and not linings_end:
+			for les in les_start:
+				les.delete()
+				les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
+					pair     = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+					group    = les.group,
+					teacher  = les.teacher,
+					audience = les.audience, 
+					subject  = les.subject)
+				les.save()
+			for les in les_end:
+				les.delete()
+				les = Schedule(day = Day.objects.get(day__contains=start_les[0]),
+					pair     = Pair.objects.get(pair_number = start_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+					group    = les.group,
+					teacher  = les.teacher,
+					audience = les.audience, 
+					subject  = les.subject)
+				les.save()
 	elif action == "replace":
-		for les in les_start:
-			les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
-				pair     = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
-				group    = les.group,
-				teacher  = les.teacher,
-				audience = les.audience, 
-				subject  = les.subject)
-			les.save()
+		if not linings_start:
+			for les in les_start:
+				les.delete()
+				les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
+					pair     = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+					group    = les.group,
+					teacher  = les.teacher,
+					audience = les.audience, 
+					subject  = les.subject)
+				les.save()
 
 	result = {}
-	result['status'] = "ok"
+	result['status'] = str(linings_start) + str(linings_end)
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
 

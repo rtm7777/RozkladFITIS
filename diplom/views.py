@@ -152,6 +152,8 @@ def rt_content(request, teacher):
 def about(request):
 	return render_to_response('about.html')
 
+def gmaps(request):
+	return render_to_response('gmaps.html')
 
 @ensure_csrf_cookie
 @csrf_protect

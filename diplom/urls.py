@@ -40,6 +40,7 @@ urlpatterns = patterns('',
 	(r'^rozklad_teacher/(.+)/$', 'diplom.views.rt_content'),
 	(r'^forum/$', 'diplom.views.forum'),
 	(r'^experimental/$', 'diplom.views.experimental'),
+	(r'^gmaps/$', 'diplom.views.gmaps'),
 
 	# Uncomment the next line to enable the admin:
 	(r'^admin/', include(admin.site.urls)),
