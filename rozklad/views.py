@@ -585,7 +585,6 @@ def dnd(request):
 	def lin_check(lessons, les):
 		lining = False
 		for lesson in lessons:
-			
 			if lesson.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
 				if lesson.pair.pair_period.period == 1:
 					lining = True
@@ -596,19 +595,21 @@ def dnd(request):
 					lining = True
 				elif int(les.pair.pair_period.period) == lesson.pair.pair_period.period or int(les.pair.pair_period.period) == 1:
 					lining = True
-			else:
-				lining = True
 		return lining
 
-	def get_lining_count(les, se_les):
+	def get_lining_count(les, se_les, exclude_les):
 		lining = False
 		lessons_t = Schedule.objects.filter(day__day__contains=se_les[0], pair__pair_number = se_les[1], teacher__teacher_last_name = les.teacher.teacher_last_name, teacher__teacher_first_name = les.teacher.teacher_first_name, teacher__teacher_middle_name = les.teacher.teacher_middle_name)
+		for l in exclude_les:
+			lessons_t = lessons_t.exclude(group__group_name = group)
 		lin_count_t = lessons_t.count()
 
 		if lin_count_t != 0:
 			lining = lin_check(lessons_t, les)
 
 		lessons_a = Schedule.objects.filter(day__day__contains=se_les[0], pair__pair_number = se_les[1], audience__number_of_audience = les.audience.number_of_audience, audience__housing__number_of_housing = les.audience.housing.number_of_housing)
+		for l in exclude_les:
+			lessons_a = lessons_a.exclude(group__group_name = group)
 		lin_count_a = lessons_a.count()
 
 		if lin_count_a != 0:
@@ -620,11 +621,11 @@ def dnd(request):
 
 	for les in les_start:
 		if not linings_start:
-			linings_start = get_lining_count(les, end_les)
+			linings_start = get_lining_count(les, end_les, les_end)
 		
 	for les in les_end:
 		if not linings_end:
-			linings_end   = get_lining_count(les, start_les)
+			linings_end   = get_lining_count(les, start_les, les_start)
 
 	if action == "swap":
 		if not linings_start and not linings_end:
