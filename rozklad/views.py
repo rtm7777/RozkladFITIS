@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from chromelogger import chromelogger as console
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule, Department, TaskChair
@@ -692,6 +694,7 @@ def getaudemp(request):
 
 	result['status'] = "ok"
 	json = jquery+'('+simplejson.dumps(result)+')'
+	console.log('Hello console!')
 	return HttpResponse(json, mimetype = 'application/json')
 
 def getteachemp(request):
