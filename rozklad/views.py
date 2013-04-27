@@ -857,13 +857,75 @@ def getconformity(request):
 	return HttpResponse(json, mimetype = 'application/json')
 
 def delsub(request):
+	jquery 		 = request.GET.get("callback")
 	group_val 	 = request.GET.get("group")
 	day_pair 	 = request.GET.get("pair").split("_")
-	jquery 		 = request.GET.get("callback")
 	subjects 	 = Schedule.objects.filter(group__group_name = group_val, day__day__contains = day_pair[0], pair__pair_number = day_pair[1])
 	for s in subjects:
 		s.delete()
 	result = {}
 	result['status'] = "ok"
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def simulate(request):
+	jquery 		 = request.GET.get("callback")
+	
+	groups 		= Group.objects.order_by("group_name")
+	groups_list = {}
+	for g in groups:
+		groups_list[g.group_name] = False
+
+	weeks = 5
+	days = 5
+
+	log = ""
+
+	period = 1
+	period2 = [2, 6, 10, 14]
+	period3 = [3, 7, 11, 15]
+	period4 = [4, 8, 12, 16]
+	period5 = [5, 9, 13, 17]
+
+	for w in range(1, weeks+1):
+		if w in period2: 
+			period = 2
+		elif w in period3:
+			period = 3
+		elif w in period4:
+			period = 4
+		elif w in period5:
+			period = 5
+
+		if w%2 != 0:
+			console.log("neparna", period)
+			for d in days_in_week:
+				for p in pair_in_day:
+					for g in groups:
+						groups_list[g.group_name] = False
+					Schedules = Schedule.objects.filter(day__day = d, pair__pair_number = p)
+					Schedules = Schedules.exclude(pair__pair_type__type_of_pair = "парна")
+					for s in Schedules:
+						if not groups_list[s.group.group_name]:
+							groups_list[s.group.group_name] = True
+							log += str(w) + "тиждень, у групи " + s.group.group_name.encode("utf-8") + " розпочалась пара  -" + d.encode("utf-8") + p.encode("utf-8") + " пара\n"
+						else:
+							log += "Група " + s.group.group_name.encode("utf-8") + " уже знадиться на парі -" + d.encode("utf-8") + p.encode("utf-8") + "\n"
+		else:
+			console.log("parna", period)
+			for d in days_in_week:
+				for p in pair_in_day:
+					for g in groups:
+						groups_list[g.group_name] = False
+					Schedules = Schedule.objects.filter(day__day = d, pair__pair_number = p)
+					Schedules = Schedules.exclude(pair__pair_type__type_of_pair = "непарна")
+					for s in Schedules:
+						if not groups_list[s.group.group_name]:
+							groups_list[s.group.group_name] = True
+							log += str(w) + "тиждень, у групи " + s.group.group_name.encode("utf-8") + " розпочалась пара  -" + d.encode("utf-8") + p.encode("utf-8") + " пара\n"
+						else:
+							log += "Група " + s.group.group_name.encode("utf-8") + " уже знадиться на парі -" + d.encode("utf-8") + p.encode("utf-8") + "\n"
+	result = {}
+	result['status'] = log
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')

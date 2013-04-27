@@ -509,6 +509,27 @@ function DeleteSubject(pair, group) {
       GetSubjects($("#group").val(), false);
       GetConformity($("#group").val());
       $("#dialog_modal").modal("hide");
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  })
+};
+
+function Simulate() {
+  $.ajax({
+    url: "/simulate",
+    dataType: "jsonp",
+    data: {},
+    beforeSend: function() {
+      $("#tab5 pre").html("Консоль\nРозпочалось симулювання розкладу\n");
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      $("#tab5 pre").append(data.status);
+      $("#load_animation").hide("fast");
     },
     error: function() {
       ShowMessage("error", "Виникла помилка");
@@ -707,6 +728,46 @@ function DisableModalOdd(property) {  //Блокування правої час
 };
 
 
+function ShowGraph() {
+  var data1 = [2,1,1,0.5,1.5];
+
+  RGraph.ObjectRegistry.Clear("cvs");
+
+  var myLine = new RGraph.Line('cvs',data1);
+  myLine.Set('chart.labels', ['Понеділок','Вівторок','Середа','Четвер',"П'ятниця"]);
+  myLine.Set('chart.gutter.left', 40);
+  myLine.Set('chart.gutter.right', 15);
+  myLine.Set('chart.gutter.bottom', 20);
+  myLine.Set('chart.colors', ['#08c']);
+  myLine.Set('chart.units.post', ' год.');
+  myLine.Set('chart.linewidth', 5);
+  myLine.Set('chart.hmargin', 35);
+  myLine.Set('numyticks', 3);
+  myLine.Set('chart.ylabels', true);
+  myLine.Set('chart.ylabels.count', 3);
+  myLine.Set('chart.ymax', 3);
+  myLine.Set('chart.ymin', 0);
+  myLine.Set('chart.text.color', '#333');
+  myLine.Set('chart.text.font', 'Arial');
+  myLine.Set('chart.background.grid.autofit', true);
+  myLine.Set('chart.background.grid.autofit.numvlines', 5);
+  myLine.Set('chart.background.grid.autofit.numhlines', 6);
+  myLine.Set('chart.shadow', true);
+  myLine.Set('chart.shadow.color', 'rgba(20,20,20,0.3)');
+  myLine.Set('chart.shadow.blur',  10);
+  myLine.Set('chart.shadow.offsetx', 0);
+  myLine.Set('chart.shadow.offsety', 0);
+  myLine.Set('chart.background.grid.vlines', true);
+  myLine.Set('chart.background.grid.border', true);
+  myLine.Set('chart.noxaxis', true);
+  myLine.Set('chart.title', 'Навантаження групи - ....');
+  myLine.Set('chart.axis.color', '#666');
+  myLine.Set('chart.text.color', '#666');
+  myLine.Set('chart.spline', true);
+  RGraph.Effects.Line.jQuery.Trace(myLine);
+};
+
+
 //////// DOCUMENT READY ///////////
 $(document).ready(function() {
 
@@ -785,6 +846,10 @@ $(document).ready(function() {
 
   $("a[href='#tab3']").click(function() {  // Оновлення при виборі вкладки
     GetTeachEmployment($("#tab3 div button.active").val());
+  });
+
+  $("a[href='#simulate']").click(function() {  // симуляція навчання
+    Simulate();
   });
 
   $("#daycheck").click(function() {  // Зміна стану діалогового вікна заняття
@@ -937,6 +1002,11 @@ $(document).ready(function() {
 
   $(".subject_content").on("mouseover", function(e) {
     $(this).children(".mov_elem").show();
+  });
+
+  /////////// Canvas + Rgraph //////////////
+  $("a[href='#rgraph']").click(function() {  // графік
+    ShowGraph();
   });
 
 });
