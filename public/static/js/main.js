@@ -515,7 +515,7 @@ function DeleteSubject(pair, group) {
       ShowMessage("error", "Виникла помилка");
       $("#load_animation").hide("fast");
     }
-  })
+  });
 };
 
 function Simulate() {
@@ -529,13 +529,58 @@ function Simulate() {
     },
     success: function(data) {
       $("#tab5 pre").append(data.status);
+      $("#tab5 pre").append(data.dat);
       $("#load_animation").hide("fast");
     },
     error: function() {
       ShowMessage("error", "Виникла помилка");
       $("#load_animation").hide("fast");
     }
-  })
+  });
+};
+
+function GetGroupsofYear(year) {
+  $.ajax({
+    url: "/getgroups",
+    dataType: "jsonp",
+    data: {year: year},
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      $(".rgraph_buttons .nav").html(" ");
+      $.map(data.data, function(item) {
+        $(".rgraph_buttons .nav").append('<li><a href="#" value="'+item+'">'+item+'</a></li>');
+      });
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+};
+
+function GetGroupLoading(group) {
+  grloaddata = [];
+  $.ajax({
+    url: "/getgrouploading",
+    dataType: "jsonp",
+    data: {group: group},
+    async: false,
+    beforeSend: function() {
+      $("#load_animation").show("fast");
+    },
+    success: function(data) {
+      grloaddata = data.data;
+      $("#load_animation").hide("fast");
+    },
+    error: function() {
+      ShowMessage("error", "Виникла помилка");
+      $("#load_animation").hide("fast");
+    }
+  });
+  return grloaddata;
 };
 
 $(function() { // Функція для входу користувача (Ajax)
@@ -551,6 +596,10 @@ $(function() { // Функція для входу користувача (Ajax)
     });
   });
 });
+
+
+
+
 
 
 ///////////  FUNCTIONS SECTION //////////////
@@ -728,12 +777,9 @@ function DisableModalOdd(property) {  //Блокування правої час
 };
 
 
-function ShowGraph() {
-  var data1 = [2,1,1,0.5,1.5];
-
+function ShowGraph(data) {
+  var myLine = new RGraph.Line('cvs',data);
   RGraph.ObjectRegistry.Clear("cvs");
-
-  var myLine = new RGraph.Line('cvs',data1);
   myLine.Set('chart.labels', ['Понеділок','Вівторок','Середа','Четвер',"П'ятниця"]);
   myLine.Set('chart.gutter.left', 40);
   myLine.Set('chart.gutter.right', 15);
@@ -744,14 +790,14 @@ function ShowGraph() {
   myLine.Set('chart.hmargin', 35);
   myLine.Set('numyticks', 3);
   myLine.Set('chart.ylabels', true);
-  myLine.Set('chart.ylabels.count', 3);
-  myLine.Set('chart.ymax', 3);
+  myLine.Set('chart.ylabels.count', 6);
+  myLine.Set('chart.ymax', 6);
   myLine.Set('chart.ymin', 0);
   myLine.Set('chart.text.color', '#333');
   myLine.Set('chart.text.font', 'Arial');
   myLine.Set('chart.background.grid.autofit', true);
   myLine.Set('chart.background.grid.autofit.numvlines', 5);
-  myLine.Set('chart.background.grid.autofit.numhlines', 6);
+  myLine.Set('chart.background.grid.autofit.numhlines', 12);
   myLine.Set('chart.shadow', true);
   myLine.Set('chart.shadow.color', 'rgba(20,20,20,0.3)');
   myLine.Set('chart.shadow.blur',  10);
@@ -763,8 +809,7 @@ function ShowGraph() {
   myLine.Set('chart.title', 'Навантаження групи - ....');
   myLine.Set('chart.axis.color', '#666');
   myLine.Set('chart.text.color', '#666');
-  myLine.Set('chart.spline', true);
-  RGraph.Effects.Line.jQuery.Trace(myLine);
+  myLine.Draw();
 };
 
 
@@ -901,6 +946,11 @@ $(document).ready(function() {
     $("#stream_pair").val($(this).attr("value"));
   });
 
+  $(".rgraph_buttons .dropdown-menu li a").click(function() {
+    $(".rgraph_buttons .btn-group>a").html($(this).text()+" <span class='caret'></span>");
+    GetGroupsofYear($(this).attr("value"));
+  });
+
   $('#groups-popover').popover({
     trigger: 'manual',
     html: true,
@@ -1005,8 +1055,12 @@ $(document).ready(function() {
   });
 
   /////////// Canvas + Rgraph //////////////
-  $("a[href='#rgraph']").click(function() {  // графік
-    ShowGraph();
+  $("a[href='#rgraphgr']").click(function() {  // графік
+    $("#graph_modal").modal('show');
+  });
+
+  $(document).on('click', "#graph_modal .nav>li>a", function() {
+    ShowGraph(GetGroupLoading($(this).attr("value")));
   });
 
 });

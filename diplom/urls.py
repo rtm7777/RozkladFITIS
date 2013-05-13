@@ -25,6 +25,8 @@ urlpatterns = patterns('',
 	(r'getconformity$', 'rozklad.views.getconformity'),		#відповідність розклада завданню
 	(r'delsub$', 'rozklad.views.delsub'),					#видалення занять
 	(r'simulate$', 'rozklad.views.simulate'),				#моделювання
+	(r'getgroups$', 'rozklad.views.getgroups'),				#список груп певного курсу
+	(r'getgrouploading$', 'rozklad.views.getgrouploading'),	#навантаження певної групи
 
 	(r'login$', 'diplom.views.ajax_login'),
 	(r'^logout/$', logout, {'template_name': 'login.html'}),

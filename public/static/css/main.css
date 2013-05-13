@@ -74,6 +74,20 @@
 	display: none;
 }
 
+#graph_modal .modal-body {
+	overflow: auto;
+}
+
+.rgraph_buttons {
+	float: left;
+	width: 110px;
+	margin: 0 10px 10px 0;
+}
+
+.rgraph_buttons .btn-group {
+	margin-bottom: 10px;
+}
+
 
 .bysy_cell {
 	background-color: #0bf !important;
@@ -192,6 +206,10 @@ tr:hover:nth-child(6n-5) td:first-child {
 }
 
 /*Оформлення головного меню навігації*/
+.navbar-inner {
+	padding-right: 10px;
+}
+
 .navbar {
 	margin-bottom: 10px;
 }

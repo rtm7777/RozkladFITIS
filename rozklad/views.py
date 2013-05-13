@@ -7,6 +7,7 @@ from django.shortcuts import render_to_response
 from rozklad.models import Group, Teacher, Housing, AudienceType, Audience, SubjectsType, Subject, PairType, Pair, Day, Schedule, Department, TaskChair
 from django.utils import simplejson
 from django.contrib import auth
+from django.db.models import Q
 
 days_in_week = [u'1Понеділок', u'2Вівторок', u'3Середа', u'4Четвер', u"5П'ятниця"]
 pair_in_day = ['I', 'II', 'III', 'IV', 'V', 'VI']
@@ -257,8 +258,7 @@ def pair_add(request):
 			pair_add.errors = "true"
 
 	def check_lining_teacher(teacher, period, eo="кожен"):
-		lessons = Schedule.objects.filter(day__day = day, pair__pair_number = pair, teacher__teacher_last_name =  teacher[0], teacher__teacher_first_name = teacher[1], teacher__teacher_middle_name = teacher[2])
-		lessons = lessons.exclude(day__day = day, pair__pair_number = pair, group__group_name = group_val)
+		lessons = Schedule.objects.filter(day__day = day, pair__pair_number = pair, teacher__teacher_last_name =  teacher[0], teacher__teacher_first_name = teacher[1], teacher__teacher_middle_name = teacher[2]).exclude(day__day = day, pair__pair_number = pair, group__group_name = group_val)
 		pair_add.lin_count_t = lessons.count()
 
 		if pair_add.lin_count_t != 0:
@@ -280,8 +280,7 @@ def pair_add(request):
 
 
 	def check_lining_audience(audience, period, eo="кожен"):
-		lessons = Schedule.objects.filter(day__day = day, pair__pair_number = pair, audience__number_of_audience = audience[0], audience__housing__number_of_housing = audience[1])
-		lessons = lessons.exclude(day__day = day, pair__pair_number = pair, group__group_name = group_val)
+		lessons = Schedule.objects.filter(day__day = day, pair__pair_number = pair, audience__number_of_audience = audience[0], audience__housing__number_of_housing = audience[1]).exclude(day__day = day, pair__pair_number = pair, group__group_name = group_val)
 		pair_add.lin_count_a = lessons.count()
 
 		if pair_add.lin_count_a != 0:
@@ -871,21 +870,46 @@ def delsub(request):
 def simulate(request):
 	jquery 		 = request.GET.get("callback")
 	
-	groups 		= Group.objects.order_by("group_name")
-	groups_list = {}
+	groups 		 = Group.objects.order_by("group_name")
+	groups_list  = {}
 	for g in groups:
 		groups_list[g.group_name] = False
 
-	weeks = 5
-	days = 5
+	weeks = 1  #кількість тижнів
 
-	log = ""
+	log   = ""
 
-	period = 1
+	period  = 1
 	period2 = [2, 6, 10, 14]
 	period3 = [3, 7, 11, 15]
 	period4 = [4, 8, 12, 16]
 	period5 = [5, 9, 13, 17]
+
+	simulate_result = {}
+	simulate_result_log = ""
+
+	for w in range(1, weeks+1):
+		simulate_result[w] = {}
+		for d in days_in_week:
+			simulate_result[w][d] = {}
+			for p in pair_in_day:
+				simulate_result[w][d][p] = {'success': [], 'unsuccess': []}
+				
+
+	def gen(week, period, wType, result):
+		log = ""
+		for d in days_in_week:
+			for p in pair_in_day:
+				for g in groups:
+					groups_list[g.group_name] = False
+				Schedules = Schedule.objects.filter(day__day = d, pair__pair_number = p).filter(Q(pair__pair_period__period = period) | Q(pair__pair_period__period = 1)).exclude(pair__pair_type__type_of_pair = wType)
+				for s in Schedules:
+					if not groups_list[s.group.group_name]:
+						result[week][d][s.pair.pair_number]['success'].append(s.group.group_name)
+						groups_list[s.group.group_name] = True
+					else:
+						result[week][d][s.pair.pair_number]['unsuccess'].append(s.group.group_name)
+		return log
 
 	for w in range(1, weeks+1):
 		if w in period2: 
@@ -898,34 +922,59 @@ def simulate(request):
 			period = 5
 
 		if w%2 != 0:
-			console.log("neparna", period)
-			for d in days_in_week:
-				for p in pair_in_day:
-					for g in groups:
-						groups_list[g.group_name] = False
-					Schedules = Schedule.objects.filter(day__day = d, pair__pair_number = p)
-					Schedules = Schedules.exclude(pair__pair_type__type_of_pair = "парна")
-					for s in Schedules:
-						if not groups_list[s.group.group_name]:
-							groups_list[s.group.group_name] = True
-							log += str(w) + "тиждень, у групи " + s.group.group_name.encode("utf-8") + " розпочалась пара  -" + d.encode("utf-8") + p.encode("utf-8") + " пара\n"
-						else:
-							log += "Група " + s.group.group_name.encode("utf-8") + " уже знадиться на парі -" + d.encode("utf-8") + p.encode("utf-8") + "\n"
+			log += gen(w, period, "парна", simulate_result)
 		else:
-			console.log("parna", period)
-			for d in days_in_week:
-				for p in pair_in_day:
-					for g in groups:
-						groups_list[g.group_name] = False
-					Schedules = Schedule.objects.filter(day__day = d, pair__pair_number = p)
-					Schedules = Schedules.exclude(pair__pair_type__type_of_pair = "непарна")
-					for s in Schedules:
-						if not groups_list[s.group.group_name]:
-							groups_list[s.group.group_name] = True
-							log += str(w) + "тиждень, у групи " + s.group.group_name.encode("utf-8") + " розпочалась пара  -" + d.encode("utf-8") + p.encode("utf-8") + " пара\n"
-						else:
-							log += "Група " + s.group.group_name.encode("utf-8") + " уже знадиться на парі -" + d.encode("utf-8") + p.encode("utf-8") + "\n"
+			log += gen(w, period, "непарна", simulate_result)
+
+	for key in sorted(simulate_result):
+		for key2 in sorted(simulate_result[key]):
+			for key3 in sorted(simulate_result[key][key2]):
+				simulate_result_log += str(key).encode("utf-8") + " тиждень " + key2.encode("utf-8")[1:] + " " + key3.encode("utf-8") + " пара: успішно - "
+				for i in simulate_result[key][key2][key3]['success']:
+					simulate_result_log += i.encode("utf-8") + ", "
+				simulate_result_log += " невдало -"
+				for i in simulate_result[key][key2][key3]['unsuccess']:
+					simulate_result_log += i.encode("utf-8") + ", "
+				simulate_result_log += "\n"
+
+
 	result = {}
 	result['status'] = log
+	result['dat'] = simulate_result_log
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def getgroups(request):
+	jquery 		 = request.GET.get("callback")
+	
+	year	 	 = request.GET.get("year")
+	groups 		 = Group.objects.filter(year = year).order_by("group_name")
+	groups_list  = []
+	for g in groups:
+		groups_list.append(g.group_name)
+
+	result = {}
+	result['data'] = groups_list
+	json = jquery+'('+simplejson.dumps(result)+')'
+	return HttpResponse(json, mimetype = 'application/json')
+
+def getgrouploading(request):
+	jquery 	= request.GET.get("callback")
+	group	= request.GET.get("group")
+	data 	= [0, 0, 0, 0, 0]
+	i = 0
+	for d in days_in_week:
+		schedules = Schedule.objects.filter(group__group_name = group, day__day = d)
+		for s in schedules:
+			if s.pair.pair_type.type_of_pair.encode("utf-8") == "кожен":
+				data[i] += 2
+			else:
+				if s.pair.pair_period.period == 1:
+					data[i] +=1
+				else:
+					data[i] += 0.5
+		i += 1
+	result = {}
+	result['data'] = data
 	json = jquery+'('+simplejson.dumps(result)+')'
 	return HttpResponse(json, mimetype = 'application/json')
