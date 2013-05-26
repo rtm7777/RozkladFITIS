@@ -135,6 +135,9 @@
 															<div class="alert alert-info" value="replace">
 																Замінити
 															</div>
+															<div class="alert alert-info" value="copy">
+																Копіювати
+															</div>
 														</div>
 													</div>
 													<div class="mov_elem">
@@ -155,10 +158,12 @@
 										<h3>Заняття</h3>
 									</div>
 									<div class="modal-body">
-										<div>
+										<div class="daycheckdiv">
 											<label class="checkbox">
 												<input id="daycheck" type="checkbox"> Кожен тиждень - парний/непарний
 											</label>
+											<button id="clear_s_modal" type="button" class="btn" title="Очистити"><i class="icon-remove"></i></button>
+											<button id="swap_s_modal" type="button" class="btn" title="Поміняти місцями"><i class="icon-chevron-left"></i><i class="icon-chevron-right"></i></button>
 										</div>
 										<div class="modal_container">
 											<div class="modal_cont1">
@@ -592,6 +597,7 @@
 									<h3>Видалити заняття</h3>
 								</div>
 								<div class="modal-body">
+									<input id="dm_type" type="text">
 									<input id="dm_param" type="text">
 									<p>Ви впевнені?</p>
 								</div>

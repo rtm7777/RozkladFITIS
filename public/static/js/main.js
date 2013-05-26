@@ -160,7 +160,10 @@ function SendSubjectData(lining) {  // Відправка Ajax на сервер
           ShowModalMessageAdv("#subject_add_modal", "Можлива накладка");
         } else {
           $("#load_animation").hide("fast");
-          ShowModalMessage("#subject_add_modal", data.errors_message);
+          $.map(data.error_inputs, function(item) {
+            $("#" + item).addClass("input_error");
+          });
+          ShowModalMessage("#subject_add_modal", "Деякі поля некоректно введено");
         };
       };
     },
@@ -248,6 +251,7 @@ function GetSubjects(group_val, message) {  // Отримання JSON заня�
 };
 
 function SingleModalWindow(elem) {  // Отримання JSON занять для конкретної групи, дня, пари і їх відображення
+  ResetModalInputs();
   if ($("#group").val() !== "") {
     $("#load_animation").show("fast");
     $("#day").prop({value: elem.attr("customdata")});
@@ -305,7 +309,7 @@ function SingleModalWindow(elem) {  // Отримання JSON занять дл
   }; 
 };
 
-function GetAudEmployment(house, day) {
+function GetAudEmployment(house, day) {  // Відображення зайнятості аудиторій
   $.ajax({
     url: "/getaudemp",
     dataType: "jsonp",
@@ -424,7 +428,7 @@ function GetDepTasks(dep) {
     success: function(data) {
       $("#tab4 table tbody").html(" ");
       $.map(data.tasks, function(item) {
-        $("#tab4 table tbody").append("<tr><td><p>"+item.subject+"</p></td><td><p>"+item.group+"</p></td><td><p>"+item.time+"</p></td><td><p>"+item.teacher+"</p></td><td><p>"+item.audience+"</p></td></tr>");
+        $("#tab4 table tbody").append("<tr><td><p>"+item.subject+"</p></td><td><p>"+item.group+"</p></td><td><p>"+item.time+"</p></td><td><p>"+item.teacher+"</p></td><td class='task_content' value='"+ item.id +"'><p>"+item.audience+"</p><div class='mov_elem_tasks'><div><button class='btn btn-large' title='Редагувати'><i class='icon-pencil'></i></button><button class='btn btn-large' title='Видалити'><i class='icon-remove'></i></button></div></div></td></tr>");
       });
       $("#load_animation").hide("fast");
     },
@@ -494,20 +498,25 @@ function AddDepTask() {
   });
 };
 
-function DeleteSubject(pair, group) {
+function DeleteSubTask(type, id, group) {
   $.ajax({
     url: "/delsub",
     dataType: "jsonp",
     data: {
+      type: type,
       group: group,
-      pair: pair
+      id: id
     },
     beforeSend: function() {
       $("#load_animation").show("fast");
     },
     success: function() {
-      GetSubjects($("#group").val(), false);
-      GetConformity($("#group").val());
+      if (type == "1") {
+        GetSubjects($("#group").val(), false);
+        GetConformity($("#group").val());
+      } else if (type == "2") {
+        GetDepTasks($("#tab4_dep").val());
+      };
       $("#dialog_modal").modal("hide");
       $("#load_animation").hide("fast");
     },
@@ -597,14 +606,10 @@ $(function() { // Функція для входу користувача (Ajax)
   });
 });
 
-
-
-
-
-
 ///////////  FUNCTIONS SECTION //////////////
 $(function() {
   $("#sendsubject").click(function() { // Провірка вікна дод. заняття на заповненість
+    ResetModalInputs();
     errors = false;
     if ($("#daycheck").prop("checked")) {
       if ($("#msub1").val() !== "") {
@@ -629,12 +634,6 @@ $(function() {
     } else {
       ShowModalMessage("#subject_add_modal", "Заповніть всі поля");
     };
-  });
-});
-
-$(function() {
-  $("#adv_send_sub").click(function() {
-    SendSubjectData("false");
   });
 });
 
@@ -667,29 +666,6 @@ $(function() {
     } else {
       ShowModalMessage("#add_stream_modal", "Заповніть всі поля");
     };
-  });
-});
-
-$(function() {
-  $("#add_dep_task").click(function(){
-  if ($("#sub_task").val() == "" || $("#group_task").val() == "" || $("#teach_task").val() == "") {
-    ShowModalMessage("#add_task_modal", "Заповніть всі поля");
-  } else {
-    AddDepTask();
-  };
-  });
-});
-
-$(function() {
-  $("#dialog_yes").click(function(){
-    DeleteSubject($("#dm_param").val(), $("#group").val());
-  });
-});
-
-$(function() { //Очистка полів введення у вікні додавання заняття
-  $(".modal_container div div button").click(function() {
-    var button = $(this).val();
-    $(button).val('');
   });
 });
 
@@ -761,6 +737,10 @@ function DisableModalEven(property) {  //Блокування лівої час�
   };
 };
 
+function ResetModalInputs() {
+  $("#subject_add_modal input").removeClass("input_error");
+};
+
 function DisableModalOdd(property) {  //Блокування правої частини діалогового вікна
   $("#msub2, #ssub2").prop({disabled: property});
   $("#mteach2, #steach2").prop({disabled: property});
@@ -774,6 +754,7 @@ function DisableModalOdd(property) {  //Блокування правої час
   } else{
     $(".modal_container .modal_cont2 div label").removeClass("label_disabled");
   };
+  $("#swap_s_modal").prop({disabled: property});
 };
 
 
@@ -781,17 +762,17 @@ function ShowGraph(data) {
   var myLine = new RGraph.Line('cvs',data);
   RGraph.ObjectRegistry.Clear("cvs");
   myLine.Set('chart.labels', ['Понеділок','Вівторок','Середа','Четвер',"П'ятниця"]);
-  myLine.Set('chart.gutter.left', 40);
+  myLine.Set('chart.gutter.left', 50);
   myLine.Set('chart.gutter.right', 15);
   myLine.Set('chart.gutter.bottom', 20);
   myLine.Set('chart.colors', ['#08c']);
   myLine.Set('chart.units.post', ' год.');
   myLine.Set('chart.linewidth', 5);
   myLine.Set('chart.hmargin', 35);
-  myLine.Set('numyticks', 3);
+  myLine.Set('numyticks', 6);
   myLine.Set('chart.ylabels', true);
-  myLine.Set('chart.ylabels.count', 6);
-  myLine.Set('chart.ymax', 6);
+  myLine.Set('chart.ylabels.count', 12);
+  myLine.Set('chart.ymax', 12);
   myLine.Set('chart.ymin', 0);
   myLine.Set('chart.text.color', '#333');
   myLine.Set('chart.text.font', 'Arial');
@@ -826,7 +807,22 @@ $(document).ready(function() {
 
   $(document).on('click', ".mov_elem div button:last-child", function() {
     pair = $(this).parents("tr").attr("id");
+    $("#dialog_modal .modal-header h3").text("Видалити заняття?");
+    $("#dm_type").val("1");
     $("#dm_param").val(pair);
+    $("#dialog_modal").modal('show');
+  });
+
+  $(document).on("click", ".mov_elem_tasks div button:first-child", function() {
+    task = $(this).parents("td").attr("value");
+    console.log("edit" + task);
+  });
+
+  $(document).on("click", ".mov_elem_tasks div button:last-child", function() {
+    task = $(this).parents("td").attr("value");
+    $("#dialog_modal .modal-header h3").text("Видалити завдання?");
+    $("#dm_type").val("2");
+    $("#dm_param").val(task);
     $("#dialog_modal").modal('show');
   });
 
@@ -845,6 +841,43 @@ $(document).ready(function() {
           }, 400);
           return false;
       });
+  });
+
+  $("#clear_s_modal").click(function() {
+    ClearSubModal();
+  });
+
+  $("#swap_s_modal").click(function() {
+    var sub1 = $("#msub1").val();
+    var teach1 = $("#mteach1").val();
+    var aud1 = $("#maud1").val();
+    $("#msub1").val($("#msub2").val());
+    $("#mteach1").val($("#mteach2").val());
+    $("#maud1").val($("#maud2").val());
+    $("#msub2").val(sub1);
+    $("#mteach2").val(teach1);
+    $("#maud2").val(aud1);
+  });
+
+  $(".modal_container div div button").click(function() {  //Очистка полів введення у вікні додавання заняття
+    var button = $(this).val();
+    $(button).val('');
+  });
+
+  $("#dialog_yes").click(function(){
+    DeleteSubTask($("#dm_type").val(), $("#dm_param").val(), $("#group").val());
+  });
+
+  $("#adv_send_sub").click(function() {
+    SendSubjectData("false");
+  });
+
+  $("#add_dep_task").click(function(){
+    if ($("#sub_task").val() == "" || $("#group_task").val() == "" || $("#teach_task").val() == "") {
+      ShowModalMessage("#add_task_modal", "Заповніть всі поля");
+    } else {
+      AddDepTask();
+    };
   });
 
   $("#group_id li a").click(function() { // Завантаження розкладу для сторінки адміністрування
@@ -1054,6 +1087,14 @@ $(document).ready(function() {
     $(this).children(".mov_elem").show();
   });
 
+  $(document).on('mouseout', ".task_content", function() {
+    $(this).children(".mov_elem_tasks").hide();
+  });
+
+  $(document).on('mouseover', ".task_content", function() {
+    $(this).children(".mov_elem_tasks").show();
+  });
+
   /////////// Canvas + Rgraph //////////////
   $("a[href='#rgraphgr']").click(function() {  // графік
     $("#graph_modal").modal('show');
@@ -1064,5 +1105,3 @@ $(document).ready(function() {
   });
 
 });
-
-

@@ -180,7 +180,7 @@ def pair_add(request):
 	pairs_objects = Pair.objects.filter(pair_number = pair)
 
 	pair_add.errors 		= ""
-	pair_add.errors_message = "Некорректно введено:"
+	pair_add.error_inputs   = []
 	pair_add.lining 		= ""
 	pair_add.lin_count_t 	= 0
 	pair_add.lin_count_a 	= 0
@@ -227,34 +227,34 @@ def pair_add(request):
 		try:
 			pair_add.s_subject = Subject.objects.get(subject_name = subject1_split[0], subject_type__type_of_subject = subject1_split[1])
 		except:
-			pair_add.errors_message += " предмет1,"
+			pair_add.error_inputs.append("msub1")
 			pair_add.errors = "true"
 		try:
 			pair_add.s_teacher = Teacher.objects.get(teacher_last_name = teacher1[0], teacher_first_name = teacher1[1], teacher_middle_name = teacher1[2])
 		except:
-			pair_add.errors_message += " викладач1,"
+			pair_add.error_inputs.append("mteach1")
 			pair_add.errors = "true"
 		try:
 			pair_add.s_audience = Audience.objects.get(number_of_audience = audience1_split[0], housing__number_of_housing = audience1_split[1])
 		except:
-			pair_add.errors_message += " аудиторія1,"
+			pair_add.error_inputs.append("maud1")
 			pair_add.errors = "true"
 
 	def error_check2():
 		try:
 			pair_add.s_subject2 = Subject.objects.get(subject_name = subject2_split[0], subject_type__type_of_subject = subject2_split[1])
 		except:
-			pair_add.errors_message += " предмет2,"
+			pair_add.error_inputs.append("msub2")
 			pair_add.errors = "true"
 		try:
 			pair_add.s_teacher2 = Teacher.objects.get(teacher_last_name = teacher2[0], teacher_first_name = teacher2[1], teacher_middle_name = teacher2[2])
 		except:
-			pair_add.errors_message += " викладач2,"
+			pair_add.error_inputs.append("mteach2")
 			pair_add.errors = "true"
 		try:
 			pair_add.s_audience2 = Audience.objects.get(number_of_audience = audience2_split[0], housing__number_of_housing = audience2_split[1])
 		except:
-			pair_add.errors_message += " аудиторія2,"
+			pair_add.error_inputs.append("maud2")
 			pair_add.errors = "true"
 
 	def check_lining_teacher(teacher, period, eo="кожен"):
@@ -374,7 +374,7 @@ def pair_add(request):
 
 	result 					 = {}
 	result['errors'] 		 = pair_add.errors
-	result['errors_message'] = pair_add.errors_message[:-1]
+	result['error_inputs']   = pair_add.error_inputs
 	result['lining'] 		 = pair_add.lining
 	result['count'] 		 = str(pair_add.lin_count_t) + " __ " + str(pair_add.lin_count_a)
 	json 					 = jquery+'('+simplejson.dumps(result)+')'
@@ -650,6 +650,8 @@ def dnd(request):
 				les.save()
 	elif action == "replace":
 		if not linings_start:
+			for les in les_end:
+				les.delete()
 			for les in les_start:
 				les.delete()
 				les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
@@ -659,7 +661,18 @@ def dnd(request):
 					audience = les.audience, 
 					subject  = les.subject)
 				les.save()
-
+	elif action == "copy":
+		if not linings_start:
+			for les in les_end:
+				les.delete()
+			for les in les_start:
+				les = Schedule(day = Day.objects.get(day__contains=end_les[0]),
+					pair     = Pair.objects.get(pair_number = end_les[1], pair_type__type_of_pair = les.pair.pair_type.type_of_pair, pair_period__period = les.pair.pair_period.period ),
+					group    = les.group,
+					teacher  = les.teacher,
+					audience = les.audience, 
+					subject  = les.subject)
+				les.save()
 	result = {}
 	result['status'] = str(linings_start) + str(linings_end)
 	json = jquery+'('+simplejson.dumps(result)+')'
@@ -741,6 +754,7 @@ def getdeptasks(request):
 		items["group"]   = task.group.group_name
 		items["time"]    = str(task.duration)
 		items["teacher"] = task.teacher.teacher_last_name + " " + task.teacher.teacher_first_name + " " + task.teacher.teacher_middle_name
+		items["id"]      = task.id
 		try:
 			items["audience"] = task.audience.number_of_audience
 		except:
@@ -857,11 +871,18 @@ def getconformity(request):
 
 def delsub(request):
 	jquery 		 = request.GET.get("callback")
+	del_type     = request.GET.get("type")
 	group_val 	 = request.GET.get("group")
-	day_pair 	 = request.GET.get("pair").split("_")
-	subjects 	 = Schedule.objects.filter(group__group_name = group_val, day__day__contains = day_pair[0], pair__pair_number = day_pair[1])
-	for s in subjects:
-		s.delete()
+	del_id	 = request.GET.get("id")
+
+	if del_type == "1":
+		day_pair = del_id.split("_")
+		subjects 	 = Schedule.objects.filter(group__group_name = group_val, day__day__contains = day_pair[0], pair__pair_number = day_pair[1])
+		for s in subjects:
+			s.delete()
+	elif del_type == "2":
+		task = TaskChair.objects.get(id = del_id)
+		task.delete()
 	result = {}
 	result['status'] = "ok"
 	json = jquery+'('+simplejson.dumps(result)+')'

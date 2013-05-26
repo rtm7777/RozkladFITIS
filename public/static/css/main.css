@@ -54,6 +54,31 @@
 	margin: 0 5px;
 }
 
+#subject_add_modal .checkbox {
+	display: inline-block;
+	width: 300px;
+}
+
+.daycheckdiv button {
+	float: right;
+	margin-right: 5px;
+}
+
+.daycheckdiv button:last-child {
+	padding: 4px 6px;
+}
+
+.input_error {
+	border-color: #b94a48 !important;
+}
+
+.input_error:focus {
+	border-color: #953b39 !important;
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392 !important;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392 !important;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392 !important;
+}
+
 /*Оформлення контейнера для модального вікна set_predmet*/
 .modal_cont1 {
 	margin: 0 15px 0 15px;
@@ -65,7 +90,7 @@
 	display: none;
 }
 
-#dm_param {
+#dm_param, #dm_type {
 	display: none;
 }
 
@@ -157,7 +182,7 @@
 }
 
 /*Оформлення таблиць розкладу та адміністрування розкладу*/
-tr:hover:nth-child(6n-5) td:first-child {
+#tab1 tr:hover:nth-child(6n-5) td:first-child {
 	background-color: white !important;
 	cursor: default;
 }
@@ -203,6 +228,11 @@ tr:hover:nth-child(6n-5) td:first-child {
 	margin: 0;
 	border-top-color: #ddd;
 	
+}
+
+#tab4 table tbody tr td:last-child {
+	table-layout: fixed;
+	width: 110px;
 }
 
 /*Оформлення головного меню навігації*/
@@ -406,4 +436,21 @@ body > .alert {
 .mov_elem div {
 	float: right;
 	margin: 2px 15px;
+}
+
+.mov_elem_tasks {
+	position: relative;
+	overflow: hidden;
+	margin-top: -38px;
+	margin-bottom: -12px;
+	display: none;
+	height: 50px;
+}
+
+.mov_elem_tasks div {
+	float: right;
+}
+
+.mov_elem_tasks div button {
+	margin-right: 1px;
 }

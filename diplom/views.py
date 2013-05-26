@@ -112,6 +112,9 @@ def rt_content(request, teacher):
 		for p in pairs:
 			result[d][p]={}
 			result[d][p]['type'] = 0
+			result[d][p]['1'] = ""
+			result[d][p]['2'] = ""
+			result[d][p]['3'] = ""
 
 	period = ""
 
@@ -132,20 +135,22 @@ def rt_content(request, teacher):
 		group = ' ' + schedule.group.group_name + ' ' + period
 
 		if schedule.pair.pair_type.type_of_pair == u'кожен':
-			result[schedule.day.day][schedule.pair.pair_number]['1'] = subject + audience + group
+			result[schedule.day.day][schedule.pair.pair_number]['1'] = subject + audience + group + '<br>'
 			result[schedule.day.day][schedule.pair.pair_number]['type'] = 1
 		elif schedule.pair.pair_type.type_of_pair == u'непарна':
-			result[schedule.day.day][schedule.pair.pair_number]['2'] = subject + audience + group
-			if result[schedule.day.day][schedule.pair.pair_number]['type'] == 0:
+			
+			if result[schedule.day.day][schedule.pair.pair_number]['type'] == 0 or result[schedule.day.day][schedule.pair.pair_number]['type'] == 2:
 				result[schedule.day.day][schedule.pair.pair_number]['type'] = 2
 			else:
 				result[schedule.day.day][schedule.pair.pair_number]['type'] = 4
+			result[schedule.day.day][schedule.pair.pair_number]['2'] += subject + audience + group + '<br>'
 		elif schedule.pair.pair_type.type_of_pair == u'парна':
-			result[schedule.day.day][schedule.pair.pair_number]['3'] = subject + audience + group
-			if result[schedule.day.day][schedule.pair.pair_number]['type'] == 0:
+			
+			if result[schedule.day.day][schedule.pair.pair_number]['type'] == 0 or result[schedule.day.day][schedule.pair.pair_number]['type'] == 3:
 				result[schedule.day.day][schedule.pair.pair_number]['type'] = 3
 			else:
 				result[schedule.day.day][schedule.pair.pair_number]['type'] = 4
+			result[schedule.day.day][schedule.pair.pair_number]['3'] += subject + audience + group + '<br>'
 
 	return render_to_response('rt_content.html', {'days': days, 'pairs': pairs, 'teachers': teachers_list, 'active_teacher': teacher, 'result': result, 'myurl': request.build_absolute_uri()})
 
